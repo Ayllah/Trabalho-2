@@ -2,10 +2,8 @@
 
 int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 	string entrada;
-	Senha* senha;
+	Senha* senha = new Senha();
 	int resultado;
-
-	//senha = new Senha();
 
 	//Perguntar id e senha
 
@@ -13,10 +11,10 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 		cout << endl << "Autenticacao de usuario." << endl << endl;
 
 		try{
-			cout << "Digite seu ID: " << endl;
+			cout << "Digite seu ID: " << endl; //pedro
 			cin >> entrada;
 			id->setIdentificador(entrada);
-			cout << "Digite sua senha: " << endl;
+			cout << "Digite sua senha: " << endl; //1a3A567$
 			cin >> entrada;
 			senha->setSenha(entrada);
 			break;
@@ -29,11 +27,6 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 	//Solicitar autenticacao
 
 	resultado = servidor->autenticar(id,senha);
-
-	// Informar resultado da autenticação.
-
-    //if(resultado.getValor() == ResultadoAutenticacao::FALHA)
-    //cout << endl << "Falha na autenticacao." << endl;
 
 	return resultado;
 }

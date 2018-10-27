@@ -11,6 +11,8 @@
 
 using namespace std;
 
+const static int SUCESSO =  0;
+
 int main()
 {
 
@@ -22,12 +24,15 @@ int main()
 	cntr->setServidor(servidor);
 	int resultado = cntr->autenticar(id);
 
-	if(resultado){
-		cout << "SUCESSO" << endl;
+	if(resultado == SUCESSO){
+		cout << endl << "SUCESSO" << endl;
 	}
 	else{
-		cout << "FALHA" << endl;
+		cout << endl << "FALHA" << endl;
 	}
+
+	delete cntr;
+	delete servidor;
 
 	return 0;
 }
