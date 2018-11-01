@@ -23,3 +23,9 @@ int CntrServAutenticacao :: autenticar(Identificador* id, Senha* senha){
 	}
 
 }
+
+int CntrServUsuario :: descadastrar(Identificador* id){
+	//Verifica os requisitos de descadastramento...
+	//Autentica novamento
+	int resultado = servidorAutenticacao->autenticar(id);
+}

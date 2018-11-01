@@ -30,3 +30,24 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 
 	return resultado;
 }
+
+int CntrAprUsuario :: descadastrar(Indentificador *id) throw(runtime_error) {
+	char opcao;
+	int resultado;
+
+	cout << "Você realmente deseja se descadastrar?" << endl;
+	cout << SIM << " - SIM" << endl;
+	cout << NAO << " - NÃO" << endl;
+	cin >> opcao;
+
+	resultado = FALHA;
+	switch(int(opcao)){
+		case SIM:
+			resultado = servidor->descadastrar(id);
+		break;
+		
+		default:
+			resultado = DESISTENCIA;
+	}
+
+}

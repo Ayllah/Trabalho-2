@@ -26,4 +26,21 @@ public:
 
 };
 
+class CntrAprUsuario : public IAprUsuario {
+private:
+	IServUsuario *servidor;//porque aqui não precisa do new
+
+public:
+	int descadastrar(Identificador *id) throw(runtime_error);
+	void setServidor(IServUsuario *servidor){
+		this->servidor = servidor;
+	}
+
+	const static char SIM = 'S';
+	const static char NAO = 'N';
+	const static int DESISTENCIA = 2;
+	const static int SUCESSO = 0;
+	const static int FALHA = -1;
+};
+
 #endif // CONTROLADORASAPRESENTACAO_H_INCLUDED

@@ -20,4 +20,14 @@ public:
 
 };
 
+class CntrServUsuario : public IServUsuario {
+private:
+	IAprAutenticacao *servidorAutenticacao;
+public:
+	int descadastrar(Indentificador* id);
+
+	const static int SUCESSO = 0;
+	const static int FALHA = -1;
+};
+
 #endif // CONTROLADORASSERVICO_H_INCLUDED
