@@ -91,8 +91,6 @@ private:
 	Identificador identificadorAcomodacao;
 	TipoDeAcomodacao acomodacaoAcomodacao;
 	CapacidadeDeAcomodacao capacidadeAcomodacao;
-	Data dataInicioAcomodacao;
-	Data dataTerminoAcomodacao;
 	Nome cidadeAcomodacao;
 	Estado siglaAcomodacao;
 	Diaria precoAcomodacao;
@@ -151,42 +149,6 @@ public:
 
     CapacidadeDeAcomodacao getCapacidadeAcomodacao() const {
         return capacidadeAcomodacao;
-    }
-
-    /**
-     *@brief Seta o objeto Data da classe Acomodação.
-     *@param dataInicioAcomodacao é a data fornecida pelo usuário.
-     */
-
-    void setDataInicioAcomodacao(Data dataInicioAcomodacao){
-        this->dataInicioAcomodacao = dataInicioAcomodacao;
-    }
-
-    /**
-     *@brief Retorna a data do objeto da classe Acomodacao.
-     *@return Data dataInicioAcomodacao (objeto da classe).
-     */
-
-    Data getDataInicioAcomodacao() const {
-        return dataInicioAcomodacao;
-    }
-
-    /**
-     *@brief Seta o objeto Data da classe Acomodação.
-     *@param dataTerminoAcomodacao é a data pelo usuário.
-     */
-
-    void setDataTerminoAcomodacao(Data dataTerminoAcomodacao){
-        this->dataTerminoAcomodacao = dataTerminoAcomodacao;
-    }
-
-    /**
-     *@brief Retorna a data do objeto da classe Acomodacao.
-     *@return Data dataTerminoAcomodacao (objeto da classe).
-     */
-
-    Data getDataTerminoAcomodacao() const {
-        return dataTerminoAcomodacao;
     }
 
     /**
@@ -359,5 +321,92 @@ public:
     }
 };
 
+class Reserva{
+private:
+    Data dataInicioReserva;
+    Data dataTerminoReserva;
+
+public:
+    /**
+     *@brief Seta o objeto Data da classe Reserva.
+     *@param dataInicioReserva é a data fornecida pelo usuário.
+     */
+
+    void setDataInicioReserva(Data dataInicioReserva){
+        this->dataInicioReserva = dataInicioReserva;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Reserva.
+     *@return Data dataInicioReserva (objeto da classe).
+     */
+
+    Data getDataInicioReserva() const {
+        return dataInicioReserva;
+    }
+
+    /**
+     *@brief Seta o objeto Data da classe Reserva.
+     *@param dataTerminoReserva é a data pelo usuário.
+     */
+
+    void setDataTerminoReserva(Data dataTerminoReserva){
+        this->dataTerminoReserva = dataTerminoReserva;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Reserva.
+     *@return Data dataTerminoReserva (objeto da classe).
+     */
+
+    Data getDataTerminoReserva() const {
+        return dataTerminoReserva;
+    }
+
+};
+
+class Disponibilidade{
+private:
+    Data dataInicioDisponibilidade;
+    Data dataTerminoDisponibilidade;
+
+public:
+    /**
+     *@brief Seta o objeto Data da classe Disponibilidade.
+     *@param dataInicioDisponibilidade é a data fornecida pelo usuário.
+     */
+
+    void setDataInicioDisponibilidade(Data dataInicioDisponibilidade){
+        this->dataInicioDisponibilidade = dataInicioDisponibilidade;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Disponibilidade.
+     *@return Data dataInicioDisponibilidade (objeto da classe).
+     */
+
+    Data getDataInicioDisponibilidade() const {
+        return dataInicioDisponibilidade;
+    }
+
+    /**
+     *@brief Seta o objeto Data da classe Disponibilidade.
+     *@param dataTerminoDisponibilidade é a data pelo usuário.
+     */
+
+    void setDataTerminoDisponibilidade(Data dataTerminoDisponibilidade){
+        this->dataTerminoDisponibilidade = dataTerminoDisponibilidade;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Disponibilidade.
+     *@return Data dataTerminoDisponibilidade (objeto da classe).
+     */
+
+    Data getDataTerminoDisponibilidade() const {
+        return dataTerminoDisponibilidade;
+    }
+
+};
 #endif // ENTIDADES_H_INCLUDED
 

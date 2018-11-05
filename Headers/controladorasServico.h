@@ -20,4 +20,20 @@ public:
 
 };
 
+class CntrServAcomodacao : public IServAcomodacao {
+public:
+
+	int cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
+	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
+	int reservar(Data *dataInicio, Data *dataTermino);
+	int cancelar(Data *dataInicio, Data *dataTermino);
+	int cadastrarDisp(Data *dataInicio, Data *dataTermino);
+	int descadastrarDisp(Data *dataInicio, Data *dataTermino);
+
+	const static int SUCESSO =  0;
+    const static int FALHA   = -1;
+	
+
+};
+
 #endif // CONTROLADORASSERVICO_H_INCLUDED
