@@ -24,8 +24,12 @@ class CntrServUsuario : public IServUsuario {
 private:
 	IAprAutenticacao *servidorAutenticacao;
 public:
-	int descadastrar(Indentificador* id);
+	int cadastrar(Nome* nome, Identificador* id, Senha* senha);
+	int descadastrar(Identificador* id);
+	const static char SIM = 'S';
+	const static char NAO = 'N';
 
+	const static int DESISTENCIA = 2;
 	const static int SUCESSO = 0;
 	const static int FALHA = -1;
 };

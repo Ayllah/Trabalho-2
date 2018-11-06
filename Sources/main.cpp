@@ -17,14 +17,19 @@ int main()
 {
 
 	IAprAutenticacao* cntr = new CntrAprAutenticacao();
+	IAprUsuario* cntrUsuario = new CntrAprUsuario();
 	IServAutenticacao* servidor = new CntrServAutenticacao();
+	IServUsuario* servidorUsuario = new CntrServUsuario();
 
 	Identificador* id = new Identificador();
 	
 	cntr->setServidor(servidor);
-	int resultado = cntr->autenticar(id);
+	cntrUsuario->setServidor(servidorUsuario);
 
-	if(resultado == SUCESSO){
+	// int resultado = cntr->autenticar(id);
+	int resultado2 = cntrUsuario->executar(id);
+	
+	if(resultado2 == SUCESSO){
 		cout << endl << "SUCESSO" << endl;
 	}
 	else{

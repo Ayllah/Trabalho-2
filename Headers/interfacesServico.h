@@ -14,4 +14,11 @@ class IServAutenticacao{
 		virtual ~IServAutenticacao(){}
 };
 
+class IServUsuario{
+	public:
+		virtual int descadastrar(Identificador* id) = 0;
+
+		virtual ~IServUsuario(){}
+};
+
 #endif // INTERFACESSERVICO_H_INCLUDED
