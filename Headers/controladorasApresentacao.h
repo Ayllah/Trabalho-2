@@ -29,6 +29,8 @@ public:
 class CntrAprUsuario : public IAprUsuario {
 private:
 	IServUsuario *servidor;
+	IServAutenticacao *servidorAut;
+
 	const static int CONTA = 1;
 	const static int PESQUISAR = 2;
 	const static int ACOMODACAO = 3;
@@ -45,12 +47,16 @@ private:
 	const static char NAO = 'N';
 
 	int painelConta(Identificador *id) throw(runtime_error);
-	int editarUsuario(Identificador *id) throw(runtime_error);
+	//int editarUsuario(Identificador *id) throw(runtime_error);
 	int descadastrarUsuario(Identificador *id) throw(runtime_error);
+
 	int cadastrarContaCorrente(Identificador *id) throw(runtime_error);
+	//int editarContaCorrent(Identificador *id) throw(runtime_error);
 	int descadastrarContaCorrente(Identificador *id) throw(runtime_error);
-	int cadastrarCartaoCredito(Identificador *id) throw(runtime_error);
-	int descadastrarCartaoCredito(Identificador *id) throw(runtime_error);
+	
+	int cadastrarCartaoDeCredito(Identificador *id) throw(runtime_error);
+	//int editarCartaoCredito(Identificador *id) throw(runtime_error);
+	int descadastrarCartaoDeCredito(Identificador *id) throw(runtime_error);
 
 public:
 	int cadastrar(Identificador *id) throw(runtime_error);

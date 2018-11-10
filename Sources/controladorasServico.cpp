@@ -29,30 +29,85 @@ int CntrServUsuario :: cadastrar(Nome* nome, Identificador* identificador, Senha
 	return 0;
 }
 
-int CntrServUsuario :: descadastrar(Identificador* id){
-	char opcao;
+int CntrServUsuario :: descadastrarUsuario(Identificador* id){
 	int resultado;
 
-	//IAprAutenticacao* cntr = new CntrAprAutenticacao();
-	IServAutenticacao* servidorAutenticacao = new CntrServAutenticacao();
-	//cntr->setServidor(servidorAutenticacao);
+	return resultado;
+}
 
-	cout << "Você deseja realmente se descadastrar?" << endl;
-	cout << SIM << " - Sim" << endl;
-	cout << NAO << " - Não" << endl;
-	cin >> opcao;
+int CntrServUsuario :: cadastrarContaCorrente(Identificador* id, NumeroDeContaCorrente* conta, Agencia* agencia, Banco* Banco){
+	int resultado;
+	NumeroDeContaCorrente* conta_recuperada = new NumeroDeContaCorrente();
+	Agencia* agencia_recuperada = new Agencia();
+	Banco* banco_recuperado = new Banco();
 
-	switch(int(opcao)){
-		case SIM:
-	//		resultado = cntr->autenticar(id);
-			break;
-		case NAO:
-			resultado = DESISTENCIA;
-			break;
-		default:
-			resultado = FALHA;
-			break;
+	// Armazena no Banco de dados
+	
+	if(id->getIdentificador() == "pedro"){
+		conta_recuperada->setContaCorrente(conta->getContaCorrente());
+		agencia_recuperada->setAgencia(agencia->getAgencia());
+		banco_recuperado->setBanco(Banco->getBanco());
 	}
 
+	// Comparar os dados informados com os dados recuperados para verificar sucesso no cadastro
+
+	if(conta->getContaCorrente() == conta_recuperada->getContaCorrente() &&
+	   agencia->getAgencia() == agencia_recuperada->getAgencia() &&
+	   banco->getBanco() == banco_recuperado->getBanco()){
+
+		// Retornar sucesso
+
+		resultado = SUCESSO;
+	   }
 	
+	else{
+		resultado = FALHA;
+	}
+
+	delete conta_recuperada;
+	delete agencia_recuperada;
+	delete banco_recuperado;
+
+	return resultado;
+}
+
+int CntrServUsuario :: descadastrarContaCorrente(Identificador* id){
+	int resultado;
+	
+	return resultado;
+}
+
+int CntrServUsuario :: cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade){
+	int resultado;
+	NumeroDeCartaoDeCredito* cartao_recuperado = new NumeroDeCartaoDeCredito();
+	DataDeValidade* dataDeValidade_recuperada = new DataDeValidade();
+
+	// Armazena no Banco de dados
+	
+	if(id->getIdentificador() == "pedro"){
+		cartao_recuperado->setNumeroDeCartaoDeCredito(cartao->getNumeroDeCartaoDeCredito());
+		dataDeValidade_recuperada->setDataDeValidade(dataDeValidade->getDataDeValidade());
+	}
+
+	// Comparar os dados informados com os dados recuperados para verificar sucesso no cadastro
+
+	if(cartao->getNumeroDeCartaoDeCredito() == cartao_recuperado->getNumeroDeCartaoDeCredito() &&
+	   dataDeValidade->getDataDeValidade() == dataDeValidade_recuperada->getDataDeValidade){
+
+		// Retornar sucesso
+
+		resultado = SUCESSO;
+	   }
+	
+	else{
+		resultado = FALHA;
+	}
+
+	return resultado;
+}
+
+int CntrServUsuario :: descadastrarCartaoDeCredito(Identificador* id){
+	int resultado;
+
+	return resultado;
 }

@@ -35,16 +35,10 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 	string opcao;
 	int resultado;
 	string entrada;
-
-	Agencia* agencia = new Agencia();
-	Banco* banco = new Banco();
-	NumeroDeContaCorrente* numeroDeContaCorrente = new NumeroDeContaCorrente();
-	NumeroDeCartaoDeCredito* numeroDeCartaoDeCredito = new NumeroDeCartaoDeCredito();
-	DataDeValidade* dataDeValidade = new DataDeValidade();
-
+	
 	while(true){
 		cout << "-------------- Minha Conta ---------------" << endl;
-		cout << EDITAR << " - Editar Perfil de Usuário" << endl;
+		//cout << EDITAR << " - Editar Perfil de Usuário" << endl;
 		cout << CADASTRAR_CONTA_CORRENTE << " - Cadastrar uma conta corrente" << endl;
 		cout << DESCADASTRAR_CONTA_CORRENTE << " - Descadastrar minha conta corrente" << endl;
 		cout << CADASTRAR_CARTAO_CREDITO << " - Cadastrar um cartão de crédito" << endl;
@@ -59,93 +53,19 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 				break;
 
 			case CADASTRAR_CONTA_CORRENTE:
-				while(true){
-					cout << endl << "Cadastro de Conta Corrente" << endl << endl;
-
-					try{
-						cout << "Digite o número de sua conta corrente: " << endl; //pedro
-						cin >> entrada;
-						numeroDeContaCorrente->setNumeroDeContaCorrente(entrada);
-						cout << "Digite o número de sua agência: " << endl; //1a3A567$
-						cin >> entrada;
-						agencia->setAgencia(entrada);
-						cout << "Digite o código do seu banco: " << endl;
-						cin >> entrada;
-						banco->setBanco(entrada);
-						break;
-					}
-					catch (const invalid_argument &exp) {
-						cout << endl << "Formato invalido! Tente novamente." << endl;
-					}	
-				}
-				
-				// Chamar servidor
-
+				resultado = cadastrarContaCorrente(id);
 				break;
 
 			case DESCADASTRAR_CONTA_CORRENTE:
-				while(true){
-					cout << "Deseja remover a conta corrente associada à sua conta?" << endl;
-					cout << SIM << " - Sim" << endl;
-					cout << NAO << " - Não" << endl;
-					cin >> entrada;
-					
-					for(int i = 0; i < entrada.size(); ++i){
-						entrada[i] = toupper(entrada[i]);
-					}
-
-					if(entrada == to_string(SIM)){
-						// chama servidor
-						break;
-					}
-					else if(entrada == to_string(NAO)){
-						break;
-					}
-				}
+				resultado = descadastrarContaCorrente(id);
 				break;
 
 			case CADASTRAR_CARTAO_CREDITO:
-				while(true){
-					cout << endl << "Cadastro de Cartão de Crédito" << endl << endl;
-
-					try{
-						cout << "Digite o número de seuu cartão de crédito: " << endl; //pedro
-						cin >> entrada;
-						numeroDeCartaoDeCredito->setNumeroDeCartaoDeCredito(entrada);
-						cout << "Digite a data de validade do seu cartão: " << endl; //1a3A567$
-						cin >> entrada;
-						dataDeValidade->setDataDeValidade(entrada);
-						break;
-					}
-					catch (const invalid_argument &exp) {
-						cout << endl << "Formato invalido! Tente novamente." << endl;
-					}	
-				}
-
-				//chamar servidor
-
+				resultado = cadastrarCartaoDeCredito(id);
 				break;
 
 			case DESCADASTRAR_CARTAO_CREDITO:
-				while(true){
-					cout << "Deseja remover o cartão de crédito associada à sua conta?" << endl;
-					cout << SIM << " - Sim" << endl;
-					cout << NAO << " - Não" << endl;
-					cin >> entrada;
-					
-					for(int i = 0; i < entrada.size(); ++i){
-						entrada[i] = toupper(entrada[i]);
-					}
-
-					if(entrada == to_string(SIM)){
-						// chama servidor
-						break;
-					}
-					else if(entrada == to_string(NAO)){
-						break;
-					}
-				}
-
+				resultado = descadastrarCartaoDeCredito(id);
 				break;
 
 			case DESCADASTRAR:
@@ -166,7 +86,153 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 		}
 	}
 
-	resultado = 0;
+	return resultado;
+}
+
+int CntrAprUsuario :: descadastrarUsuario(Identificador *id) throw(runtime_error){
+	int resultado;
+	string entrada;
+
+	while(true){
+		cout << "Você realmente deseja se descadastrar do sistema?" << endl;
+		cout << SIM << " - Sim" << endl;
+		cout << NAO << " - Não" << endl;
+		getline(cin, entrada);
+		
+		for(int i = 0; i < entrada.size(); ++i){
+			entrada[i] = toupper(entrada[i]);
+		}
+
+		if(entrada[0] == SIM){
+			// resultado = servidor
+			break;
+		}
+		else if(entrada[0] == NAO){
+			break;
+		}
+
+		cout << "Opção Inválida" << endl;
+	}
+
+	return resultado;	
+}
+
+int CntrAprUsuario :: cadastrarContaCorrente(Identificador *id) throw(runtime_error){
+	int resultado;
+	string entrada;
+
+	Agencia* agencia = new Agencia();
+	Banco* banco = new Banco();
+	NumeroDeContaCorrente* numeroDeContaCorrente = new NumeroDeContaCorrente();
+
+	while(true){
+		cout << "__________________________" << endl;
+		cout << "Cadastro de Conta Corrente" << endl << endl;
+
+		try{
+			cout << "Digite o número de sua conta corrente: " << endl; //pedro
+			cin >> entrada;
+			numeroDeContaCorrente->setNumeroDeContaCorrente(entrada);
+			cout << "Digite o número de sua agência: " << endl; //1a3A567$
+			cin >> entrada;
+			agencia->setAgencia(entrada);
+			cout << "Digite o código do seu banco: " << endl;
+			cin >> entrada;
+			banco->setBanco(entrada);
+			break;
+		}
+		catch (const invalid_argument &exp) {
+			cout << endl << "Formato invalido! Tente novamente." << endl;
+		}	
+	}
+	
+	// resultado = servidor
+	return resultado;
+}
+
+int CntrAprUsuario :: descadastrarContaCorrente(Identificador *id) throw(runtime_error){
+	int resultado;
+	string entrada;
+
+	while(true){
+		cout << "Deseja remover a conta corrente associada à sua conta?" << endl;
+		cout << SIM << " - Sim" << endl;
+		cout << NAO << " - Não" << endl;
+		getline(cin, entrada);
+		
+		for(int i = 0; i < entrada.size(); ++i){
+			entrada[i] = toupper(entrada[i]);
+		}
+
+		if(entrada[0] == SIM){ // ideal era não precisar usar o [0]
+			// resultado //servidor
+			break;
+		}
+		else if(entrada[0] == NAO){
+			break;
+		}
+
+		cout << "Opção Inválida" << endl;
+	}
+
+	return resultado;
+}
+
+int CntrAprUsuario :: cadastrarCartaoDeCredito(Identificador *id) throw(runtime_error){
+	int resultado;
+	string entrada;
+
+	NumeroDeCartaoDeCredito* numeroDeCartaoDeCredito = new NumeroDeCartaoDeCredito();
+	DataDeValidade* dataDeValidade = new DataDeValidade();
+
+	while(true){
+		cout << "_____________________________" << endl;
+		cout << "Cadastro de Cartão de Crédito" << endl << endl;
+		
+
+		try{
+			cout << "Digite o número de seuu cartão de crédito: " << endl; //pedro
+			cin >> entrada;
+			numeroDeCartaoDeCredito->setNumeroDeCartaoDeCredito(entrada);
+			cout << "Digite a data de validade do seu cartão: " << endl; //1a3A567$
+			cin >> entrada;
+			dataDeValidade->setDataDeValidade(entrada);
+			break;
+		}
+		catch (const invalid_argument &exp) {
+			cout << endl << "Formato invalido! Tente novamente." << endl;
+		}	
+	}
+
+	//resultado = servidor
+	return resultado;
+}
+
+int CntrAprUsuario :: descadastrarCartaoDeCredito(Identificador *id) throw(runtime_error){
+	int resultado;
+	string entrada;
+
+	while(true){
+		cout << "Deseja remover o cartão de crédito associado à sua conta?" << endl;
+		cout << SIM << " - Sim" << endl;
+		cout << NAO << " - Não" << endl;
+		getline(cin, entrada);
+		
+		for(int i = 0; i < entrada.size(); ++i){
+			entrada[i] = toupper(entrada[i]);
+		}
+
+		if(entrada[0] == SIM){
+			// resultado = servidor;
+			break;
+		}
+		else if(entrada[0] == NAO){
+			break;
+		}
+
+		cout << "Opção Inválida" << endl;
+	}
+
 	return resultado;
 }
 
@@ -174,13 +240,13 @@ int CntrAprUsuario :: cadastrar(Identificador *id) throw(runtime_error) {
 	string opcao;
 	int resultado;
 	string entrada;
-	//string strNome, strIdentificador, strSenha;
 	
 	Nome* nome = new Nome();
 	Identificador* identificador = new Identificador();
 	Senha* senha = new Senha();
 
-	cout << endl << "Cadastramento de Usuário." << endl;
+	cout << "_________________________" << endl;
+	cout << "Cadastramento de Usuário." << endl;
 	cout << CONTINUAR << " - Continuar" << endl;
 	cout << VOLTAR << " - Voltar" << endl;
 	getline(cin, opcao);
@@ -199,7 +265,7 @@ int CntrAprUsuario :: cadastrar(Identificador *id) throw(runtime_error) {
 			getline(cin, entrada);
 			senha->setSenha(entrada);
 
-			resultado = 0;//chama cadastrar no serviço
+			// resultado = 0;//chama cadastrar no serviço
 			break;
 
 		case VOLTAR:

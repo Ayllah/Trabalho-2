@@ -17,8 +17,9 @@ int main()
 {
 
 	IAprAutenticacao* cntr = new CntrAprAutenticacao();
-	IAprUsuario* cntrUsuario = new CntrAprUsuario();
 	IServAutenticacao* servidor = new CntrServAutenticacao();
+	
+	IAprUsuario* cntrUsuario = new CntrAprUsuario();
 	IServUsuario* servidorUsuario = new CntrServUsuario();
 
 	Identificador* id = new Identificador();

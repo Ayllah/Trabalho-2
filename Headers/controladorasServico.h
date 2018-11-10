@@ -22,12 +22,18 @@ public:
 
 class CntrServUsuario : public IServUsuario {
 private:
-	IAprAutenticacao *servidorAutenticacao;
-public:
-	int cadastrar(Nome* nome, Identificador* id, Senha* senha);
-	int descadastrar(Identificador* id);
+	//IAprAutenticacao *servidorAutenticacao;
+
 	const static char SIM = 'S';
 	const static char NAO = 'N';
+
+public:
+	int cadastrar(Nome* nome, Identificador* id, Senha* senha);
+	int descadastrarUsuario(Identificador* id);
+	int cadastrarContaCorrente(Identificador* id, NumeroDeContaCorrente* conta, Agencia* agencia, Banco* Banco);
+	int descadastrarContaCorrente(Identificador* id);
+	int cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade);
+	int descadastrarCartaoDeCredito(Identificador* id);
 
 	const static int DESISTENCIA = 2;
 	const static int SUCESSO = 0;

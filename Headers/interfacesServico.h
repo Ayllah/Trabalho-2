@@ -16,8 +16,16 @@ class IServAutenticacao{
 
 class IServUsuario{
 	public:
-		virtual int descadastrar(Identificador* id) = 0;
 
+		// Métodos por meio dos quais são solicitados serviços.
+		
+		virtual int cadastrar(Nome* nome, Identificador* id, Senha* senha) = 0;
+		virtual int descadastrarUsuario(Identificador* id) = 0;
+		virtual int cadastrarContaCorrente(Identificador* id, NumeroDeContaCorrente* conta, Agencia* agencia, Banco* Banco) = 0;
+		virtual int descadastrarContaCorrente(Identificador* id) = 0;
+		virtual int cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade) = 0;
+		virtual int descadastrarCartaoDeCredito(Identificador* id) = 0;
+		
 		virtual ~IServUsuario(){}
 };
 
