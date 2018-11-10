@@ -214,6 +214,7 @@ class CartaoDeCredito {
 private:
 	NumeroDeCartaoDeCredito numCartaoCredito;
 	DataDeValidade dataDeValidadeCartaoDeCredito;
+    Identificador identificadorCartaoDeCredito;
 
 public:
 
@@ -252,6 +253,24 @@ public:
     DataDeValidade getDataDeValidadeCartaoDeCredito() const {
         return dataDeValidadeCartaoDeCredito;
     }
+
+    /**
+     *@brief Seta o objeto Identificador da classe CartaoDeCredito.
+     *@param identificadorCartaoDeCredito é o identificador fornecido pelo usuário.
+     */
+
+    void setIdentificadorCartaoDeCredito(Identificador identificadorCartaoDeCredito){
+        this->identificadorCartaoDeCredito = identificadorCartaoDeCredito;
+    }
+
+    /**
+     *@brief Retorna o identificador do objeto da classe CartaoDeCredito.
+     *@return Identificador identificadorCartaoDeCredito (objeto da classe).
+     */
+
+    Identificador getIdentificadorCartaoDeCredito() const {
+        return identificadorCartaoDeCredito;
+    }
 };
 
 /**
@@ -263,6 +282,7 @@ private:
 	NumeroDeContaCorrente numeroContaCorrente;
 	Agencia agenciaContaCorrente;
 	Banco bancoContaCorrente;
+    Identificador identificadorContaCorrente;
 
 public:
 
@@ -319,12 +339,32 @@ public:
     Banco getBancoContaCorrente() const {
         return bancoContaCorrente;
     }
+
+    /**
+     *@brief Seta o objeto Identificador da classe ContaCorrente.
+     *@param identificadorContaCorrente é o identificador fornecido pelo usuário.
+     */
+
+    void setIdentificadorContaCorrente(Identificador identificadorContaCorrente){
+        this->identificadorContaCorrente = identificadorContaCorrente;
+    }
+
+    /**
+     *@brief Retorna o identificador do objeto da classe ContaCorrente.
+     *@return Identificador identificadorContaCorrente (objeto da classe).
+     */
+
+    Identificador getIdentificadorContaCorrente() const {
+        return identificadorContaCorrente;
+    }
 };
 
 class Reserva{
 private:
     Data dataInicioReserva;
     Data dataTerminoReserva;
+    Identificador identificadorReserva;
+    TipoDeAcomodacao acomodacaoReserva;
 
 public:
     /**
@@ -363,12 +403,49 @@ public:
         return dataTerminoReserva;
     }
 
+    /**
+     *@brief Seta o objeto Identificador da classe Reserva.
+     *@param identificadorReserva é o identificador fornecido pelo usuário.
+     */
+
+    void setIdentificadorReserva(Identificador identificadorReserva){
+        this->identificadorReserva = identificadorReserva;
+    }
+
+    /**
+     *@brief Retorna o identificador do objeto da classe Reserva.
+     *@return Identificador identificadorReserva (objeto da classe).
+     */
+
+    Identificador getIdentificadorReserva() const {
+        return identificadorReserva;
+    }
+
+    /**
+     *@brief Seta o objeto TipoDeAcomodacao da classe Reserva.
+     *@param acomodacaoReserva é o tipo de acomodação fornecida pelo usuário.
+     */
+
+    void setTipoAcomodacao(TipoDeAcomodacao acomodacaoReserva){
+        this->acomodacaoReserva = acomodacaoReserva;
+    }
+
+    /**
+     *@brief Retorna o acomodacao do objeto da classe Reserva.
+     *@return TipoDeAcomodacao acomodacaoReserva (objeto da classe).
+     */
+
+    TipoDeAcomodacao getTipoAcomodacao() const {
+        return acomodacaoReserva;
+    }
+
 };
 
 class Disponibilidade{
 private:
     Data dataInicioDisponibilidade;
     Data dataTerminoDisponibilidade;
+    TipoDeAcomodacao acomodacaoDisponibilidade;
 
 public:
     /**
@@ -405,6 +482,24 @@ public:
 
     Data getDataTerminoDisponibilidade() const {
         return dataTerminoDisponibilidade;
+    }
+
+    /**
+     *@brief Seta o objeto TipoDeAcomodacao da classe Disponibilidade.
+     *@param acomodacaoDisponibilidade é o tipo de acomodação fornecida pelo usuário.
+     */
+
+    void setTipoAcomodacao(TipoDeAcomodacao acomodacaoDisponibilidade){
+        this->acomodacaoDisponibilidade = acomodacaoDisponibilidade;
+    }
+
+    /**
+     *@brief Retorna o acomodacao do objeto da classe Disponibilidade.
+     *@return TipoDeAcomodacao acomodacaoDisponibilidade (objeto da classe).
+     */
+
+    TipoDeAcomodacao getTipoAcomodacao() const {
+        return acomodacaoDisponibilidade;
     }
 
 };

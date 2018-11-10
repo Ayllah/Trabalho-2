@@ -33,8 +33,8 @@ public:
 	virtual int executar(Identificador *id) = 0;
 	virtual int cadastrar(Identificador *id) throw(runtime_error) = 0;
 	virtual int descadastrar(Identificador *id) throw(runtime_error) = 0;
-	virtual int reservar() throw(runtime_error) = 0;
-	virtual int cancelar() throw(runtime_error) = 0;
+	virtual int reservar(Identificador *id) throw(runtime_error) = 0;
+	virtual int cancelar(Identificador *id) throw(runtime_error) = 0;
 	virtual int cadastrarDisp() throw(runtime_error) = 0;
 	virtual int descadastrarDisp() throw(runtime_error) = 0;
 

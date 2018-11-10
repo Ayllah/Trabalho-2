@@ -3,6 +3,8 @@
 int CntrServAutenticacao :: autenticar(Identificador* id, Senha* senha){
 	Senha *senha_recuperada = new Senha();
 
+	int resultado;
+
 	//Recuperar senha do repositorio
 
 	if(id->getIdentificador() == "pedro"){
@@ -15,14 +17,16 @@ int CntrServAutenticacao :: autenticar(Identificador* id, Senha* senha){
 
 		//Retornar resultado da comparacao
 
-		return SUCESSO;
+		resultado = SUCESSO;
 	}
 
 	else{
-		return FALHA;
+		resultado = FALHA;
 	}
 
 	delete senha_recuperada;
+
+	return resultado;
 
 }
 
@@ -33,6 +37,8 @@ int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, C
 	Estado *estado_recuperado = new Estado();
 	Nome *cidade_recuperada = new Nome();
 
+	int resultado;
+
 	//Recuperar dados do repositorio
 
 	if(id->getIdentificador() == "pedro"){
@@ -53,11 +59,11 @@ int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, C
 
 		//Retornar resultado da comparacao
 
-		return SUCESSO;
+		resultado = SUCESSO;
 	}
 
 	else{
-		return FALHA;
+		resultado = FALHA;
 	}
 
 	delete tipo_recuperado;
@@ -65,6 +71,8 @@ int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, C
     delete preco_recuperado;
     delete estado_recuperado;
     delete cidade_recuperada;
+
+    return resultado;
 
 }
 
@@ -75,6 +83,8 @@ int CntrServAcomodacao :: descadastrar(Identificador *id, TipoDeAcomodacao *tipo
 	Estado *estado_recuperado = new Estado();
 	Nome *cidade_recuperada = new Nome();
 
+	int resultado;
+
 	//Recuperar dados do repositorio
 
 	if(id->getIdentificador() == "pedro"){
@@ -95,11 +105,11 @@ int CntrServAcomodacao :: descadastrar(Identificador *id, TipoDeAcomodacao *tipo
 
 		//Retornar resultado da comparacao
 
-		return SUCESSO;
+		resultado = SUCESSO;
 	}
 
 	else{
-		return FALHA;
+		resultado = FALHA;
 	}
 
 	delete tipo_recuperado;
@@ -108,104 +118,147 @@ int CntrServAcomodacao :: descadastrar(Identificador *id, TipoDeAcomodacao *tipo
     delete estado_recuperado;
     delete cidade_recuperada;
 
+    return resultado;
+
 }
 
-int CntrServAcomodacao :: reservar(Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: reservar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
 	Data *data_recuperada = new Data();
+	Identificador *id_recuperado = new Identificador();
+	TipoDeAcomodacao *tipo_recuperado = new TipoDeAcomodacao();
+
+	int resultado;
 
 	//Recuperar data do repositorio
 
 	if(dataInicio->getData() == "30/jan/2018"){
 		data_recuperada->setData(dataTermino->getData());
+		id_recuperado->setIdentificador(id->getIdentificador());
+		tipo_recuperado->setTipoDeAcomodacao(tipo->getTipoDeAcomodacao());
 	}
 
 	//Comparar data informada com data recuperada
 
-	if(dataTermino->getData() == data_recuperada->getData()){
+	if((dataTermino->getData() == data_recuperada->getData()) && 
+		(id->getIdentificador() == id_recuperado->getIdentificador()) &&
+		(tipo->getTipoDeAcomodacao() == tipo_recuperado->getTipoDeAcomodacao()) ){
 
 		//Retornar resultado de comparacao
 
-		return SUCESSO;
+		resultado = SUCESSO;
 	}
 
 	else{
-		return FALHA;
+		resultado = FALHA;
 	}
 
 	delete data_recuperada;
+	delete id_recuperado;
+	delete tipo_recuperado;
+
+	return resultado;
 }
 
-int CntrServAcomodacao :: cancelar(Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: cancelar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
 	Data *data_recuperada = new Data();
+	Identificador *id_recuperado = new Identificador();
+	TipoDeAcomodacao *tipo_recuperado = new TipoDeAcomodacao();
+
+	int resultado;
 
 	//Recuperar data do repositorio
 
 	if(dataInicio->getData() == "30/jan/2018"){
 		data_recuperada->setData(dataTermino->getData());
+		id_recuperado->setIdentificador(id->getIdentificador());
+		tipo_recuperado->setTipoDeAcomodacao(tipo->getTipoDeAcomodacao());
 	}
 
 	//Comparar data informada com data recuperada
 
-	if(dataTermino->getData() == data_recuperada->getData()){
+	if((dataTermino->getData() == data_recuperada->getData()) &&
+		(id->getIdentificador() == id_recuperado->getIdentificador()) &&
+		(tipo->getTipoDeAcomodacao() == tipo_recuperado->getTipoDeAcomodacao()) ){
 
 		//Retornar resultado de comparacao
 
-		return SUCESSO;
+		resultado = SUCESSO;
 	}
 
 	else{
-		return FALHA;
+		resultado = FALHA;
 	}
 
 	delete data_recuperada;
+	delete id_recuperado;
+	delete tipo_recuperado;
+
+	return resultado;
 }
 
-int CntrServAcomodacao :: cadastrarDisp(Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: cadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
 	Data *data_recuperada = new Data();
+	TipoDeAcomodacao *tipo_recuperado = new TipoDeAcomodacao();
+
+	int resultado;
+	
 
 	//Recuperar data do repositorio
 
 	if(dataInicio->getData() == "30/jan/2018"){
 		data_recuperada->setData(dataTermino->getData());
+		tipo_recuperado->setTipoDeAcomodacao(tipo->getTipoDeAcomodacao());
 	}
 
 	//Comparar data informada com data recuperada
 
-	if(dataTermino->getData() == data_recuperada->getData()){
+	if((dataTermino->getData() == data_recuperada->getData()) && 
+		(tipo->getTipoDeAcomodacao() == tipo_recuperado->getTipoDeAcomodacao())){
 
 		//Retornar resultado de comparacao
 
-		return SUCESSO;
+		resultado = SUCESSO;
 	}
 
 	else{
-		return FALHA;
+		resultado = FALHA;
 	}
 
 	delete data_recuperada;
+	delete tipo_recuperado;
+
+	return resultado;
 }
 
-int CntrServAcomodacao :: descadastrarDisp(Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: descadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
 	Data *data_recuperada = new Data();
+	TipoDeAcomodacao *tipo_recuperado = new TipoDeAcomodacao();
+
+	int resultado;
 
 	//Recuperar data do repositorio
 
 	if(dataInicio->getData() == "30/jan/2018"){
 		data_recuperada->setData(dataTermino->getData());
+		tipo_recuperado->setTipoDeAcomodacao(tipo->getTipoDeAcomodacao());
 	}
 
 	//Comparar data informada com data recuperada
 
-	if(dataTermino->getData() == data_recuperada->getData()){
+	if((dataTermino->getData() == data_recuperada->getData()) && 
+		(tipo->getTipoDeAcomodacao() == tipo_recuperado->getTipoDeAcomodacao())){
 
 		//Retornar resultado de comparacao
 
-		return SUCESSO;
+		resultado = SUCESSO;
 	}
 
 	else{
-		return FALHA;
+		resultado = FALHA;
 	}
 
 	delete data_recuperada;
+	delete tipo_recuperado;
+
+	return resultado;
 }

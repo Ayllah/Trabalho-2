@@ -47,8 +47,8 @@ private:
 
     int cadastrar(Identificador *id) throw(runtime_error);
     int descadastrar(Identificador *id) throw(runtime_error);
-    int reservar() throw(runtime_error);
-    int cancelar() throw(runtime_error);
+    int reservar(Identificador *id) throw(runtime_error);
+    int cancelar(Identificador *id) throw(runtime_error);
     int cadastrarDisp() throw(runtime_error);
     int descadastrarDisp() throw(runtime_error);
 
