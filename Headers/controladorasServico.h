@@ -22,7 +22,8 @@ public:
 
 class CntrServUsuario : public IServUsuario {
 private:
-	//IAprAutenticacao *servidorAutenticacao;
+	// IAprAutenticacao* cntr = new CntrAprAutenticacao();
+	// IServAutenticacao* servidorAutenticacao = new CntrServAutenticacao();
 
 	const static char SIM = 'S';
 	const static char NAO = 'N';

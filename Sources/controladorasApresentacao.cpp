@@ -1,5 +1,8 @@
 #include "controladorasApresentacao.h"
 
+//***********************************************************************************************************
+// Classe CntrAprAutenticacao
+
 int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 	string entrada;
 	Senha* senha = new Senha();
@@ -12,10 +15,10 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 
 		try{
 			cout << "Digite seu ID: " << endl; //pedro
-			cin >> entrada;
+			getline(cin, entrada);
 			id->setIdentificador(entrada);
 			cout << "Digite sua senha: " << endl; //1a3A567$
-			cin >> entrada;
+			getline(cin, entrada);
 			senha->setSenha(entrada);
 			break;
 		}
@@ -30,6 +33,9 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 
 	return resultado;
 }
+
+//***********************************************************************************************************
+// Classe CntrAprUsuario
 
 int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 	string opcao;
@@ -54,22 +60,37 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 
 			case CADASTRAR_CONTA_CORRENTE:
 				resultado = cadastrarContaCorrente(id);
+				if(resultado == SUCESSO){
+					cout << "Conta corrente cadastrada com sucesso!" << endl;
+				}
 				break;
 
 			case DESCADASTRAR_CONTA_CORRENTE:
 				resultado = descadastrarContaCorrente(id);
+				if(resultado == SUCESSO){
+					cout << "Conta corrente REMOVIDA!" << endl;
+				}
 				break;
 
 			case CADASTRAR_CARTAO_CREDITO:
 				resultado = cadastrarCartaoDeCredito(id);
+				if(resultado == SUCESSO){
+					cout << "Cartão cadastrado com sucesso!" << endl;
+				}
 				break;
 
 			case DESCADASTRAR_CARTAO_CREDITO:
 				resultado = descadastrarCartaoDeCredito(id);
+				if(resultado == SUCESSO){
+					cout << "Cartão REMOVIDO!" << endl;
+				}
 				break;
 
 			case DESCADASTRAR:
-				
+				resultado = descadastrarUsuario(id);
+				if(resultado == SUCESSO){
+					cout << "Usuário removido do sistema" << endl;
+				}				
 				break;
 
 			case VOLTAR:
@@ -104,7 +125,7 @@ int CntrAprUsuario :: descadastrarUsuario(Identificador *id) throw(runtime_error
 		}
 
 		if(entrada[0] == SIM){
-			// resultado = servidor
+			resultado = servidor->descadastrarUsuario(id);
 			break;
 		}
 		else if(entrada[0] == NAO){
@@ -123,7 +144,7 @@ int CntrAprUsuario :: cadastrarContaCorrente(Identificador *id) throw(runtime_er
 
 	Agencia* agencia = new Agencia();
 	Banco* banco = new Banco();
-	NumeroDeContaCorrente* numeroDeContaCorrente = new NumeroDeContaCorrente();
+	NumeroDeContaCorrente* conta = new NumeroDeContaCorrente();
 
 	while(true){
 		cout << "__________________________" << endl;
@@ -131,13 +152,13 @@ int CntrAprUsuario :: cadastrarContaCorrente(Identificador *id) throw(runtime_er
 
 		try{
 			cout << "Digite o número de sua conta corrente: " << endl; //pedro
-			cin >> entrada;
-			numeroDeContaCorrente->setNumeroDeContaCorrente(entrada);
+			getline(cin, entrada);
+			conta->setNumeroDeContaCorrente(entrada);
 			cout << "Digite o número de sua agência: " << endl; //1a3A567$
-			cin >> entrada;
+			getline(cin, entrada);
 			agencia->setAgencia(entrada);
 			cout << "Digite o código do seu banco: " << endl;
-			cin >> entrada;
+			getline(cin, entrada);
 			banco->setBanco(entrada);
 			break;
 		}
@@ -146,7 +167,8 @@ int CntrAprUsuario :: cadastrarContaCorrente(Identificador *id) throw(runtime_er
 		}	
 	}
 	
-	// resultado = servidor
+	resultado = servidor->cadastrarContaCorrente(id, conta, agencia, banco);
+
 	return resultado;
 }
 
@@ -165,7 +187,7 @@ int CntrAprUsuario :: descadastrarContaCorrente(Identificador *id) throw(runtime
 		}
 
 		if(entrada[0] == SIM){ // ideal era não precisar usar o [0]
-			// resultado //servidor
+			resultado = servidor->descadastrarContaCorrente(id);
 			break;
 		}
 		else if(entrada[0] == NAO){
@@ -182,7 +204,7 @@ int CntrAprUsuario :: cadastrarCartaoDeCredito(Identificador *id) throw(runtime_
 	int resultado;
 	string entrada;
 
-	NumeroDeCartaoDeCredito* numeroDeCartaoDeCredito = new NumeroDeCartaoDeCredito();
+	NumeroDeCartaoDeCredito* cartao = new NumeroDeCartaoDeCredito();
 	DataDeValidade* dataDeValidade = new DataDeValidade();
 
 	while(true){
@@ -192,10 +214,10 @@ int CntrAprUsuario :: cadastrarCartaoDeCredito(Identificador *id) throw(runtime_
 
 		try{
 			cout << "Digite o número de seuu cartão de crédito: " << endl; //pedro
-			cin >> entrada;
-			numeroDeCartaoDeCredito->setNumeroDeCartaoDeCredito(entrada);
+			getline(cin, entrada);
+			cartao->setNumeroDeCartaoDeCredito(entrada);
 			cout << "Digite a data de validade do seu cartão: " << endl; //1a3A567$
-			cin >> entrada;
+			getline(cin, entrada);
 			dataDeValidade->setDataDeValidade(entrada);
 			break;
 		}
@@ -204,7 +226,10 @@ int CntrAprUsuario :: cadastrarCartaoDeCredito(Identificador *id) throw(runtime_
 		}	
 	}
 
-	//resultado = servidor
+	resultado = servidor->cadastrarCartaoDeCredito(id, cartao, dataDeValidade);
+	if(resultado == SUCESSO){
+		cout << "resultado == sucesso" << endl;
+	}
 	return resultado;
 }
 
@@ -223,7 +248,7 @@ int CntrAprUsuario :: descadastrarCartaoDeCredito(Identificador *id) throw(runti
 		}
 
 		if(entrada[0] == SIM){
-			// resultado = servidor;
+			resultado = servidor->descadastrarCartaoDeCredito(id);
 			break;
 		}
 		else if(entrada[0] == NAO){
@@ -283,10 +308,15 @@ int CntrAprUsuario :: executar (Identificador* id) throw (runtime_error){
 	int resultado;
 	bool opcaoInvalida = false;
 	
+	id->setIdentificador("pedro"); // Apagar depois
+
+	IAprAutenticacao* cntr = new CntrAprAutenticacao();
+	// IServAutenticacao* servidorAutenticacao = new CntrServAutenticacao();
+
 	while(true){
 		cout << endl << "Painel Principal" << endl << endl;
 		cout << CONTA << " - Minha conta" << endl;
-		cout << PESQUISAR << " - Pesquisar usuários" << endl;
+		cout << PESQUISAR << " - Pesquisar acomodações" << endl;
 		cout << ACOMODACAO << " - Painel de Acomodações" << endl;
 		cout << SAIR << " - Sair" << endl;
 
@@ -294,7 +324,7 @@ int CntrAprUsuario :: executar (Identificador* id) throw (runtime_error){
 
 		switch(stoi(opcao)){
 			case CONTA:
-				painelConta(id);
+				resultado = painelConta(id);
 				break;
 
 			case PESQUISAR:
@@ -316,7 +346,8 @@ int CntrAprUsuario :: executar (Identificador* id) throw (runtime_error){
 		if(stoi(opcao) == SAIR){
 			break;
 		}
+		
 	}
-	
+
 	return resultado;
-};
+}
