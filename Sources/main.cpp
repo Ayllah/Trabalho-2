@@ -22,15 +22,21 @@ int main()
 	IAprUsuario* cntrUsuario = new CntrAprUsuario();
 	IServUsuario* servidorUsuario = new CntrServUsuario();
 
+	IAprAcomodacao* cntrAcomodacao = new CntrAprAcomodacao();
+	IServAcomodacao* servidorAcomodacao = new CntrServAcomodacao();
+
 	Identificador* id = new Identificador();
 	
 	cntr->setServidor(servidor);
 	cntrUsuario->setServidor(servidorUsuario);
+	cntrAcomodacao->setServidor(servidorAcomodacao);
 
-	// int resultado = cntr->autenticar(id);
-	int resultado2 = cntrUsuario->executar(id);
+	// cntrUsuario->setServidorAutenticacao(servidor);
+
+	int resultado = cntr->autenticar(id);
+	// int resultado2 = cntrAcomodacao->executar(id);
 	
-	if(resultado2 == SUCESSO){
+	if(resultado == SUCESSO){
 		cout << endl << "SUCESSO" << endl;
 	}
 	else{
