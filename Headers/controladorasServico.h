@@ -22,8 +22,6 @@ public:
 
 class CntrServUsuario : public IServUsuario {
 private:
-	// IAprAutenticacao* cntr = new CntrAprAutenticacao();
-	// IServAutenticacao* servidorAutenticacao = new CntrServAutenticacao();
 
 	const static char SIM = 'S';
 	const static char NAO = 'N';
@@ -40,5 +38,22 @@ public:
 	const static int SUCESSO = 0;
 	const static int FALHA = -1;
 };
+
+class CntrServAcomodacao : public IServAcomodacao {
+public:
+
+	int cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
+	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
+	int reservar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
+	int cancelar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
+	int cadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
+	int descadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
+
+	const static int SUCESSO =  0;
+    const static int FALHA   = -1;
+	
+
+};
+
 
 #endif // CONTROLADORASSERVICO_H_INCLUDED

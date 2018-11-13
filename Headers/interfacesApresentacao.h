@@ -42,4 +42,28 @@ class IAprUsuario{
 
 };
 
+class IAprAcomodacao{
+public:
+
+	//Método por meio do qual é solicitado serviço
+
+	virtual int executar(Identificador *id) = 0;
+	virtual int cadastrar(Identificador *id) throw(runtime_error) = 0;
+	virtual int descadastrar(Identificador *id) throw(runtime_error) = 0;
+	virtual int reservar(Identificador *id) throw(runtime_error) = 0;
+	virtual int cancelar(Identificador *id) throw(runtime_error) = 0;
+	virtual int cadastrarDisp() throw(runtime_error) = 0;
+	virtual int descadastrarDisp() throw(runtime_error) = 0;
+
+	//Método por meio do qual é estabelecida ligação (link) com a controladora de negócio
+
+	virtual void setServidor(IServAcomodacao *servidor) = 0;
+
+	// Destrutor virtual
+
+	virtual ~IAprAcomodacao(){}
+	
+};
+
+
 #endif // INTERFACESAPRESENTACAO_H_INCLUDED
