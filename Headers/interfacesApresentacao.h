@@ -9,20 +9,37 @@
 using namespace std;
 
 class IAprAutenticacao{
-public:
+	public:
 
-	//Método por meio do qual é solicitado serviço
+		//Método por meio do qual é solicitado serviço
 
-	virtual int autenticar(Identificador *id) throw(runtime_error) = 0;
+		virtual int autenticar(Identificador *id) throw(runtime_error) = 0;
 
-	//Método por meio do qual é estabelecida ligação (link) com a controladora de negócio
+		//Método por meio do qual é estabelecida ligação (link) com a controladora de negócio
 
-	virtual void setServidor(IServAutenticacao *servidor) = 0;
+		virtual void setServidor(IServAutenticacao *servidor) = 0;
 
-	// Destrutor virtual
+		// Destrutor virtual
 
-	virtual ~IAprAutenticacao(){}
+		virtual ~IAprAutenticacao(){}
 	
+};
+
+class IAprUsuario{
+	public:
+		//Método por meio do qual é solicitado serviço
+		
+		virtual int cadastrar(Identificador* id) throw(runtime_error) = 0;
+		virtual int executar(Identificador* id) throw(runtime_error) = 0;
+
+		//Método por meio do qual é estabelecida ligação (link) com a controladora de negócio
+
+		virtual void setServidor(IServUsuario *servidor) = 0;
+
+		//Destrutor virtual
+
+		virtual ~IAprUsuario(){}
+
 };
 
 class IAprAcomodacao{
@@ -47,5 +64,6 @@ public:
 	virtual ~IAprAcomodacao(){}
 	
 };
+
 
 #endif // INTERFACESAPRESENTACAO_H_INCLUDED
