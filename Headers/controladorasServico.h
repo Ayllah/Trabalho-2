@@ -98,11 +98,29 @@ class ComandoCadastrarContaCorrente : public ContainerUsuario {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisarContaCorrente.
+
+class ComandoPesquisarContaCorrente : public ContainerUsuario {
+	public:
+		ComandoPesquisarContaCorrente(Identificador);
+		ContaCorrente getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarCartaoDeCredito.
 
 class ComandoCadastrarCartaoDeCredito : public ContainerUsuario {
 	public:
 		ComandoCadastrarCartaoDeCredito(Identificador, CartaoDeCredito);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisarCartaoDeCredito.
+
+class ComandoPesquisarCartaoDeCredito : public ContainerUsuario {
+	public:
+		ComandoPesquisarCartaoDeCredito(Identificador);
+		CartaoDeCredito getResultado() throw (EErroPersistencia);
 };
 
 //---------------------------------------------------------------------------
@@ -123,13 +141,13 @@ public:
 class CntrServUsuario : public IServUsuario {
 private:
 
-	const static char SIM = 'S';
-	const static char NAO = 'N';
-	const static int DESISTENCIA = 2;
+	const static int CARTAO_DE_CREDITO_JA_CADASTRADO = 3;
+	const static int CONTA_CORRENTE_JA_CADASTRADA = 2;
 	const static int USUARIO_JA_CADASTRADO = 1;
 	const static int SUCESSO = 0;
 	const static int FALHA = -1;
-	
+	const static int DESISTENCIA = -2;
+
 public:
 	int cadastrar(Nome* nome, Identificador* id, Senha* senha);
 	int descadastrarUsuario(Identificador* id);

@@ -153,7 +153,7 @@ Usuario ComandoPesquisarUsuario :: getResultado() throw (EErroPersistencia){
 //---------------------------------------------------------------------------
 // Classe ComandoCadastrarContaCorrente.
 
-ComandoCadastrarContaCorrente :: ComandoCadastrarContaCorrente(Identificador id, ContaCorrente contaCorrente){
+ComandoCadastrarContaCorrente :: ComandoCadastrarContaCorrente (Identificador id, ContaCorrente contaCorrente){
 	cout << "Antes de set" << containerUsuario << endl;
 	cout << "Banco aqui: " << contaCorrente.getBancoContaCorrente().getBanco() << endl;
 	cout << "ID:" << id.getIdentificador() << endl;
@@ -168,6 +168,74 @@ ComandoCadastrarContaCorrente :: ComandoCadastrarContaCorrente(Identificador id,
 }
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisarContaCorrente.
+
+ComandoPesquisarContaCorrente :: ComandoPesquisarContaCorrente (Identificador id){
+	containerUsuario = "SELECT NumeroConta, Agencia, Banco FROM Usuarios WHERE Identificador = ";
+	containerUsuario += '\'' + id.getIdentificador() + '\'';
+	containerUsuario += " AND NumeroConta <> null";
+}
+
+ContaCorrente ComandoPesquisarContaCorrente :: getResultado() throw (EErroPersistencia) {
+	ElementoResultado resultado;
+	NumeroDeContaCorrente numeroDeContaCorrente;
+	Agencia agencia;
+	Banco banco;
+	ContaCorrente contaCorrente;
+
+	cout << "parte 0" << endl;
+
+	//Remover Numero Conta Corrente
+	if(listaResultado.empty()){
+		return contaCorrente;
+		throw EErroPersistencia("Lista de resultado vazia.");
+	}
+	resultado = listaResultado.back();
+	listaResultado.pop_back();
+
+	// if(resultado.getValorColuna().size() == 0){
+	// 	return contaCorrente;
+	// 	throw EErroPersistencia("Valor recuperado na lista de resultado fora do padrao.");
+	// }
+
+	// cout << "conta recuperada" << resultado.getValorColuna() << endl;
+	numeroDeContaCorrente.setNumeroDeContaCorrente(resultado.getValorColuna());
+	contaCorrente.setNumeroContaCorrente(numeroDeContaCorrente);
+
+	// cout << "parte 1" << endl;
+
+	//Remover Agencia
+	if(listaResultado.empty()){
+		return contaCorrente;
+		throw EErroPersistencia("Lista de resultado vazia.");
+	}
+	resultado = listaResultado.back();
+	listaResultado.pop_back();
+	
+	// if(resultado.getValorColuna().size() == 0){
+	// 	return contaCorrente;
+	// 	throw EErroPersistencia("Valor recuperado na lista de resultado fora do padrao.");
+	// }
+
+	agencia.setAgencia(resultado.getValorColuna());
+	contaCorrente.setAgenciaContaCorrente(agencia);	
+
+	cout << "parte 2" << endl;
+
+	//Remover Banco
+	if(listaResultado.empty()){
+		return contaCorrente;
+		throw EErroPersistencia("Lista de resultado vazia.");
+	}
+	resultado = listaResultado.back();
+	listaResultado.pop_back();
+	banco.setBanco(resultado.getValorColuna());
+	contaCorrente.setBancoContaCorrente(banco);	
+	
+	return contaCorrente;
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarCartaoDeCredito.
 
 ComandoCadastrarCartaoDeCredito :: ComandoCadastrarCartaoDeCredito(Identificador id, CartaoDeCredito cartaoDeCredito){
@@ -178,6 +246,43 @@ ComandoCadastrarCartaoDeCredito :: ComandoCadastrarCartaoDeCredito(Identificador
 	containerUsuario += '\'' + id.getIdentificador() + '\'';
 }
 
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisarCartaoDeCredito.
+
+ComandoPesquisarCartaoDeCredito :: ComandoPesquisarCartaoDeCredito (Identificador id){
+	containerUsuario = "SELECT NumeroCartao, ValidadeCartao FROM Usuarios WHERE Identificador = ";
+	containerUsuario += '\'' + id.getIdentificador() + '\'';
+	containerUsuario += " AND NumeroCartao <> null";
+}
+
+CartaoDeCredito ComandoPesquisarCartaoDeCredito :: getResultado() throw (EErroPersistencia){
+	ElementoResultado resultado;
+	NumeroDeCartaoDeCredito cartao;
+	DataDeValidade dataDeValidade;
+	CartaoDeCredito cartaoDeCredito;
+
+	// Remover Numero Cartao de Credito
+	if(listaResultado.empty()){
+		return cartaoDeCredito;
+		throw EErroPersistencia("Lista de resultado vazia.");
+	}
+	resultado = listaResultado.back();
+	listaResultado.pop_back();
+	cartao.setNumeroDeCartaoDeCredito(resultado.getValorColuna());
+	cartaoDeCredito.setNumeroCartaoCredito(cartao);
+
+	// Remover Data de Validade
+	if(listaResultado.empty()){
+		return cartaoDeCredito;
+		throw EErroPersistencia("Lista de resultado vazia.");
+	}
+	resultado = listaResultado.back();
+	listaResultado.pop_back();
+	dataDeValidade.setDataDeValidade(resultado.getValorColuna());
+	cartaoDeCredito.setDataDeValidadeCartaoDeCredito(dataDeValidade);	
+
+	return cartaoDeCredito;
+}
 //---------------------------------------------------------------------------
 //Classe Controle Servico Autenticacao.
 
@@ -258,25 +363,47 @@ int CntrServUsuario :: descadastrarUsuario(Identificador* id){
 
 }
 
-int CntrServUsuario :: cadastrarContaCorrente(Identificador* id, NumeroDeContaCorrente* conta, Agencia* agencia, Banco* banco){
+int CntrServUsuario :: cadastrarContaCorrente(Identificador* identificador, NumeroDeContaCorrente* conta, Agencia* agencia, Banco* banco){
 	ContaCorrente contaCorrente;
+	ContaCorrente contaCorrente_recuperada;
 
 	contaCorrente.setNumeroContaCorrente(*conta);
 	contaCorrente.setAgenciaContaCorrente(*agencia);
 	contaCorrente.setBancoContaCorrente(*banco);
 
-	// Se já tem uma conta corrente cadastrada, sobrescreve
-
-	ComandoCadastrarContaCorrente comando (*id, contaCorrente);
-
+	// Verificar se já existe uma conta corrente cadastrada
+	ComandoPesquisarContaCorrente comandoPesquisar(*identificador);
+	
 	try{
-		comando.executar();
-		return SUCESSO;
+		comandoPesquisar.executar();
+		contaCorrente_recuperada = comandoPesquisar.getResultado();
 	}
 	catch (EErroPersistencia){
-		cout << "Erro no cadastro" << endl;
+		cout << "Erro" << endl;
 		return FALHA;
 	}
+
+	// Se não encontra uma conta corrente já cadastrada
+	if(contaCorrente_recuperada.getNumeroContaCorrente().getNumeroDeContaCorrente().size() == 0 &&
+	   contaCorrente_recuperada.getAgenciaContaCorrente().getAgencia().size() == 0 &&
+	   contaCorrente_recuperada.getBancoContaCorrente().getBanco().size() == 0){
+		
+		ComandoCadastrarContaCorrente comando(*identificador, contaCorrente);
+		
+		try{
+			comando.executar();
+		}
+		catch (EErroPersistencia){
+			cout << "Erro no cadastro" << endl;
+			return FALHA;
+		}
+
+		return SUCESSO;
+   	}
+	else{
+		return CONTA_CORRENTE_JA_CADASTRADA;
+	}
+
 }
 
 int CntrServUsuario :: descadastrarContaCorrente(Identificador* id){
@@ -284,19 +411,41 @@ int CntrServUsuario :: descadastrarContaCorrente(Identificador* id){
 
 int CntrServUsuario :: cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade){
 	CartaoDeCredito cartaoDeCredito;
+	CartaoDeCredito cartaoDeCredito_recuperado;
 
 	cartaoDeCredito.setNumeroCartaoCredito(*cartao);
 	cartaoDeCredito.setDataDeValidadeCartaoDeCredito(*dataDeValidade);
 
-	ComandoCadastrarCartaoDeCredito comando (*id, cartaoDeCredito);
+	ComandoPesquisarCartaoDeCredito comandoPesquisar(*id);
 
 	try{
-		comando.executar();
-		return SUCESSO;
+		comandoPesquisar.executar();
+		cartaoDeCredito_recuperado = comandoPesquisar.getResultado();
 	}
 	catch (EErroPersistencia){
-		cout << "Erro no cadastro" << endl;
+		cout << "Erro" << endl;
 		return FALHA;
+	}
+
+	// Se não encontra um cartao de credito ja cadastrado
+
+	if(cartaoDeCredito_recuperado.getNumeroCartaoCredito().getNumeroDeCartaoDeCredito().size() == 0 &&
+	   cartaoDeCredito_recuperado.getDataDeValidadeCartaoDeCredito().getDataDeValidade().size() == 0){
+		
+		ComandoCadastrarCartaoDeCredito comando(*id, cartaoDeCredito);
+		
+		try{
+			comando.executar();
+		}
+		catch (EErroPersistencia){
+			cout << "Erro no cadastro" << endl;
+			return FALHA;
+		}
+
+		return SUCESSO;
+   	}
+	else{
+		return CARTAO_DE_CREDITO_JA_CADASTRADO;
 	}
 }
 

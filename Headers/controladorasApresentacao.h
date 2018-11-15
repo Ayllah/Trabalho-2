@@ -45,16 +45,18 @@ private:
 	const static int DESCADASTRAR_CARTAO_CREDITO = 5;
 	const static int DESCADASTRAR = 6;
 
+	const static int VOLTAR = 0;
+	const static int CONTINUAR = 1;
+	
 	const static char SIM = 'S';
 	const static char NAO = 'N';
 
-	const static int VOLTAR = 0;
-	const static int CONTINUAR = 1;
-
-	const static int DESISTENCIA = 2;
+	const static int CARTAO_DE_CREDITO_JA_CADASTRADO = 3;
+	const static int CONTA_CORRENTE_JA_CADASTRADA = 2;
 	const static int USUARIO_JA_CADASTRADO = 1;
 	const static int SUCESSO = 0;
 	const static int FALHA = -1;
+	const static int DESISTENCIA = -2;
 
 	int painelConta(Identificador *id) throw(runtime_error);
 	//int editarUsuario(Identificador *id) throw(runtime_error);

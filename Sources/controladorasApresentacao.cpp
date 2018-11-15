@@ -50,7 +50,7 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 
 
 	while(true){
-		cout << "-------------- Minha Conta ---------------" << endl;
+		cout << endl << "-------------- Minha Conta ---------------" << endl;
 		//cout << EDITAR << " - Editar Perfil de Usuario" << endl;
 		cout << CADASTRAR_CONTA_CORRENTE << " - Cadastrar uma conta corrente" << endl;
 		cout << DESCADASTRAR_CONTA_CORRENTE << " - Descadastrar minha conta corrente" << endl;
@@ -68,10 +68,19 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 				break;
 
 			case CADASTRAR_CONTA_CORRENTE:
+			
 				resultado = cadastrarContaCorrente(id);
+
 				if(resultado == SUCESSO){
 					cout << "Conta corrente cadastrada com sucesso!" << endl;
 				}
+				else if(resultado == CONTA_CORRENTE_JA_CADASTRADA){
+					cout << "Ja existe uma conta corrente associada a sua conta." << endl;
+				}
+				else if(resultado == FALHA){
+					cout << "Erro no cadastramento de conta corrente." << endl;
+				}
+				
 				break;
 
 			case DESCADASTRAR_CONTA_CORRENTE:
@@ -83,9 +92,17 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 
 			case CADASTRAR_CARTAO_CREDITO:
 				resultado = cadastrarCartaoDeCredito(id);
+
 				if(resultado == SUCESSO){
 					cout << "Cartão cadastrado com sucesso!" << endl;
 				}
+				else if(resultado == CARTAO_DE_CREDITO_JA_CADASTRADO){
+					cout << "Ja existe um cartao de credito associado a sua conta." << endl;
+				}
+				else if(resultado == FALHA){
+					cout << "Erro no cadastramento de cartao de credito." << endl;
+				}
+
 				break;
 
 			case DESCADASTRAR_CARTAO_CREDITO:
