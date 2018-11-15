@@ -601,7 +601,7 @@ void Senha::validar(string senha) throw (invalid_argument){
     int verificadorRepeticao;
     int i;
 
-    string simbolos[QUANTIDADE_SIMBOLOS_PERMITIDOS] = {"!", "#", "$", "%%", "&"};
+    string simbolos[QUANTIDADE_SIMBOLOS_PERMITIDOS] = {"!", "#", "$", "\%", "&"};
 
     verificadorTamanho = senha.size();
     verificadorSimbolo = verificaSimbolo(senha, &simbolos[0]);

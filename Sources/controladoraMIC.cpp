@@ -35,19 +35,11 @@ void CntrMIC :: cadastrar(){
     Identificador *id = new Identificador();
 
     resultado = cntrUsuario->cadastrar(id);
-
-    if(resultado == SUCESSO){
-        cout << "Cadastro feito com sucesso" << endl;
-        return;
-    }
-    else{
-        return;
-    }
 }
 
 void CntrMIC :: menu(){
     string opcao;
-
+    
     inicializar();
 	
 	while(!SAIR){
@@ -57,10 +49,11 @@ void CntrMIC :: menu(){
 		cout << CADASTRAR << " - Cadastrar" << endl;
 		cout << SAIR << " - Sair" << endl;
 		getline(cin, opcao);
-
+        // Problemas com entrada inváldia do usuario. Tipo, digitar uma letra junto com o número
 		switch(stoi(opcao)){
-			case ENTRAR:    entrar();
-				            break;
+			case ENTRAR:
+				entrar();
+				break;
 
 			case CADASTRAR:
 				cadastrar();

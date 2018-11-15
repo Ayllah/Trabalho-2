@@ -29,7 +29,9 @@ public:
 class CntrAprUsuario : public IAprUsuario {
 private:
 	IServUsuario *servidor;
-	// IAprAutenticacao *cntrAutenticacao;
+	
+	IAprAutenticacao *cntrAutenticacao;
+	IAprAcomodacao *cntrAcomodacao;
 
 	const static int CONTA = 1;
 	const static int PESQUISAR = 2;
@@ -43,8 +45,18 @@ private:
 	const static int DESCADASTRAR_CARTAO_CREDITO = 5;
 	const static int DESCADASTRAR = 6;
 
+	const static int VOLTAR = 0;
+	const static int CONTINUAR = 1;
+	
 	const static char SIM = 'S';
 	const static char NAO = 'N';
+
+	const static int CARTAO_DE_CREDITO_JA_CADASTRADO = 3;
+	const static int CONTA_CORRENTE_JA_CADASTRADA = 2;
+	const static int USUARIO_JA_CADASTRADO = 1;
+	const static int SUCESSO = 0;
+	const static int FALHA = -1;
+	const static int DESISTENCIA = -2;
 
 	int painelConta(Identificador *id) throw(runtime_error);
 	//int editarUsuario(Identificador *id) throw(runtime_error);
@@ -60,18 +72,11 @@ private:
 
 public:
 	int cadastrar(Identificador *id) throw(runtime_error);
-	int executar(Identificador* id) throw(runtime_error);
+	int executar(Identificador *id) throw(runtime_error);
 
 	void setServidor(IServUsuario *servidor){
 		this->servidor = servidor;
 	}
-
-	const static int VOLTAR = 0;
-	const static int CONTINUAR = 1;
-	
-	const static int DESISTENCIA = 2;
-	const static int SUCESSO = 0;
-	const static int FALHA = -1;
 };
 
 class CntrAprAcomodacao : public IAprAcomodacao {
@@ -99,7 +104,7 @@ public:
 	 // Método previsto na interface por meio do qual é solicitada execução da controladora.
 
     int executar(Identificador *id);
-
+	int consultar(Identificador *id);
     // Método por meio do qual é estabelecido relacionamento com o servidor.
 
     void setServidor(IServAcomodacao *servidor){

@@ -12,12 +12,9 @@
 
 using namespace std;
 
-const static int SUCESSO =  0;
-const static int SAIR = 0;
-
-int main()
-{
+int main(){
 	CntrMIC *cntr = new CntrMIC();
+	
 	cntr->menu();
 
 	return 0;

@@ -31,4 +31,4 @@ class CntrMIC{
         void menu();
 };
 
-#endif //CONTROLADORA_MIC_H
+#endif //

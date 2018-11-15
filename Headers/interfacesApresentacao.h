@@ -46,7 +46,7 @@ class IAprAcomodacao{
 public:
 
 	//Método por meio do qual é solicitado serviço
-
+	virtual int consultar(Identificador *id) = 0;
 	virtual int executar(Identificador *id) = 0;
 	virtual int cadastrar(Identificador *id) throw(runtime_error) = 0;
 	virtual int descadastrar(Identificador *id) throw(runtime_error) = 0;

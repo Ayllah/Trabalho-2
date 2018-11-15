@@ -1,17 +1,18 @@
 #include "controladorasApresentacao.h"
 #include "controladorasServico.h" // Porque precisa dessa linha?
+
 //***********************************************************************************************************
 // Classe CntrAprAutenticacao
 
 int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 	string entrada;
-	Senha* senha = new Senha();
+	Senha *senha = new Senha();
 	int resultado;
 
 	//Perguntar id e senha
 
 	while(true){
-		cout << endl << "Autenticacao de Usuário." << endl << endl;
+		cout << endl << "Autenticacao de Usuario." << endl << endl;
 
 		try{
 			cout << "Digite seu ID: " << endl; //pedro
@@ -20,6 +21,7 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 			cout << "Digite sua senha: " << endl; //1a3A567$
 			getline(cin, entrada);
 			senha->setSenha(entrada);
+
 			break;
 		}
 		catch (const invalid_argument &exp) {
@@ -28,7 +30,6 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 	}
 
 	//Solicitar autenticacao
-
 	resultado = servidor->autenticar(id,senha);
 
 	return resultado;
@@ -42,15 +43,23 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 	int resultado;
 	string entrada;
 	
+	IAprAutenticacao *cntrAutenticacao = new CntrAprAutenticacao();
+	IServAutenticacao *servidorAutenticacao = new CntrServAutenticacao();
+	
+	cntrAutenticacao->setServidor(servidorAutenticacao);
+
+
 	while(true){
-		cout << "-------------- Minha Conta ---------------" << endl;
-		//cout << EDITAR << " - Editar Perfil de Usuário" << endl;
+		cout << endl << "-------------- Minha Conta ---------------" << endl;
+		//cout << EDITAR << " - Editar Perfil de Usuario" << endl;
 		cout << CADASTRAR_CONTA_CORRENTE << " - Cadastrar uma conta corrente" << endl;
 		cout << DESCADASTRAR_CONTA_CORRENTE << " - Descadastrar minha conta corrente" << endl;
-		cout << CADASTRAR_CARTAO_CREDITO << " - Cadastrar um cartão de crédito" << endl;
-		cout << DESCADASTRAR_CARTAO_CREDITO << " - Descastrar meu cartão de crédito" << endl;
+		cout << CADASTRAR_CARTAO_CREDITO << " - Cadastrar um cartao de credito" << endl;
+		cout << DESCADASTRAR_CARTAO_CREDITO << " - Descastrar meu cartao de credito" << endl;
 		cout << DESCADASTRAR << " - Descadastrar minha conta"<< endl;
 		cout << VOLTAR << " - Voltar" << endl;
+		cout << "Selecione uma opcao : ";
+		
 		getline(cin, opcao);
 
 		switch(stoi(opcao)){
@@ -59,10 +68,19 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 				break;
 
 			case CADASTRAR_CONTA_CORRENTE:
+			
 				resultado = cadastrarContaCorrente(id);
+
 				if(resultado == SUCESSO){
 					cout << "Conta corrente cadastrada com sucesso!" << endl;
 				}
+				else if(resultado == CONTA_CORRENTE_JA_CADASTRADA){
+					cout << "Ja existe uma conta corrente associada a sua conta." << endl;
+				}
+				else if(resultado == FALHA){
+					cout << "Erro no cadastramento de conta corrente." << endl;
+				}
+				
 				break;
 
 			case DESCADASTRAR_CONTA_CORRENTE:
@@ -74,9 +92,17 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 
 			case CADASTRAR_CARTAO_CREDITO:
 				resultado = cadastrarCartaoDeCredito(id);
+
 				if(resultado == SUCESSO){
 					cout << "Cartão cadastrado com sucesso!" << endl;
 				}
+				else if(resultado == CARTAO_DE_CREDITO_JA_CADASTRADO){
+					cout << "Ja existe um cartao de credito associado a sua conta." << endl;
+				}
+				else if(resultado == FALHA){
+					cout << "Erro no cadastramento de cartao de credito." << endl;
+				}
+
 				break;
 
 			case DESCADASTRAR_CARTAO_CREDITO:
@@ -87,10 +113,21 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 				break;
 
 			case DESCADASTRAR:
-				resultado = descadastrarUsuario(id);
+				
+				resultado = cntrAutenticacao->autenticar(id);
 				if(resultado == SUCESSO){
-					cout << "Usuário removido do sistema" << endl;
-				}				
+					resultado = descadastrarUsuario(id);
+					
+					if(resultado == SUCESSO){
+						cout << "Usuario removido do sistema" << endl;
+						break;
+					}				
+				}
+				else{
+					cout << "Falha na autenticação" << endl;
+				}
+
+				
 				break;
 
 			case VOLTAR:
@@ -98,7 +135,7 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 				break;
 
 			default:
-				cout << "Opção inválida" << endl;
+				cout << "Opcao Invalida" << endl;
 				break;
 		}
 
@@ -106,6 +143,9 @@ int CntrAprUsuario :: painelConta(Identificador *id) throw(runtime_error){
 			break;
 		}
 	}
+
+	delete cntrAutenticacao;
+	delete servidorAutenticacao;
 
 	return resultado;
 }
@@ -115,38 +155,30 @@ int CntrAprUsuario :: descadastrarUsuario(Identificador *id) throw(runtime_error
 	int autentica = SUCESSO;
 	string entrada;
 
-	// IServAutenticacao* servidorAutenticacao = new CntrServAutenticacao();
-	// cntrAutenticacao->setServidor(servidorAutenticacao);
-
 	while(true){
 		cout << "Você realmente deseja se descadastrar do sistema?" << endl;
 		cout << SIM << " - Sim" << endl;
 		cout << NAO << " - Não" << endl;
+		cout << "Selecione uma opcao : ";
+
 		getline(cin, entrada);
 		
 		for(int i = 0; i < entrada.size(); ++i){
 			entrada[i] = toupper(entrada[i]);
 		}
 
-		if(entrada[0] == SIM){
+		if(entrada[0] == SIM){ // Verificar possibilidade do usuário digitar mais de 1 caracter
 			// Busca no BD
-			// autentica = cntrAutenticacao->autenticar(id);
 			
-			if(autentica == SUCESSO){
-				resultado = servidor->descadastrarUsuario(id);
-				break;
-			}
-			else{
-				// Alguma mensagem;
-			}
-			
-			
-		}
+			resultado = servidor->descadastrarUsuario(id);
+			break; 
+		}		
+		
 		else if(entrada[0] == NAO){
 			break;
 		}
 
-		cout << "Opção Inválida" << endl;
+		cout << "Opcao Invalida" << endl;
 	}
 
 	return resultado;	
@@ -156,9 +188,9 @@ int CntrAprUsuario :: cadastrarContaCorrente(Identificador *id) throw(runtime_er
 	int resultado;
 	string entrada;
 
-	Agencia* agencia = new Agencia();
-	Banco* banco = new Banco();
-	NumeroDeContaCorrente* conta = new NumeroDeContaCorrente();
+	Agencia *agencia = new Agencia();
+	Banco *banco = new Banco();
+	NumeroDeContaCorrente *conta = new NumeroDeContaCorrente();
 
 	while(true){
 		cout << "__________________________" << endl;
@@ -194,6 +226,8 @@ int CntrAprUsuario :: descadastrarContaCorrente(Identificador *id) throw(runtime
 		cout << "Deseja remover a conta corrente associada à sua conta?" << endl;
 		cout << SIM << " - Sim" << endl;
 		cout << NAO << " - Não" << endl;
+		cout << "Selecione uma opcao : ";
+
 		getline(cin, entrada);
 		
 		for(int i = 0; i < entrada.size(); ++i){
@@ -208,7 +242,7 @@ int CntrAprUsuario :: descadastrarContaCorrente(Identificador *id) throw(runtime
 			break;
 		}
 
-		cout << "Opção Inválida" << endl;
+		cout << "Opcao Invalida" << endl;
 	}
 
 	return resultado;
@@ -218,19 +252,19 @@ int CntrAprUsuario :: cadastrarCartaoDeCredito(Identificador *id) throw(runtime_
 	int resultado;
 	string entrada;
 
-	NumeroDeCartaoDeCredito* cartao = new NumeroDeCartaoDeCredito();
-	DataDeValidade* dataDeValidade = new DataDeValidade();
+	NumeroDeCartaoDeCredito *cartao = new NumeroDeCartaoDeCredito();
+	DataDeValidade *dataDeValidade = new DataDeValidade();
 
 	while(true){
 		cout << "_____________________________" << endl;
-		cout << "Cadastro de Cartão de Crédito" << endl << endl;
+		cout << "Cadastro de Cartao de credito" << endl << endl;
 		
 
 		try{
-			cout << "Digite o número de seuu cartão de crédito: " << endl; //pedro
+			cout << "Digite o número de seuu cartao de credito: " << endl; //pedro
 			getline(cin, entrada);
 			cartao->setNumeroDeCartaoDeCredito(entrada);
-			cout << "Digite a data de validade do seu cartão: " << endl; //1a3A567$
+			cout << "Digite a data de validade do seu cartao: " << endl; //1a3A567$
 			getline(cin, entrada);
 			dataDeValidade->setDataDeValidade(entrada);
 			break;
@@ -241,9 +275,7 @@ int CntrAprUsuario :: cadastrarCartaoDeCredito(Identificador *id) throw(runtime_
 	}
 
 	resultado = servidor->cadastrarCartaoDeCredito(id, cartao, dataDeValidade);
-	if(resultado == SUCESSO){
-		cout << "resultado == sucesso" << endl;
-	}
+	
 	return resultado;
 }
 
@@ -252,9 +284,11 @@ int CntrAprUsuario :: descadastrarCartaoDeCredito(Identificador *id) throw(runti
 	string entrada;
 
 	while(true){
-		cout << "Deseja remover o cartão de crédito associado à sua conta?" << endl;
+		cout << "Deseja remover o cartao de credito associado a sua conta?" << endl;
 		cout << SIM << " - Sim" << endl;
 		cout << NAO << " - Não" << endl;
+		cout << "Selecione uma opcao : ";
+
 		getline(cin, entrada);
 		
 		for(int i = 0; i < entrada.size(); ++i){
@@ -269,7 +303,7 @@ int CntrAprUsuario :: descadastrarCartaoDeCredito(Identificador *id) throw(runti
 			break;
 		}
 
-		cout << "Opção Inválida" << endl;
+		cout << "Opcao Invalida" << endl;
 	}
 
 	return resultado;
@@ -280,31 +314,44 @@ int CntrAprUsuario :: cadastrar(Identificador *id) throw(runtime_error) {
 	int resultado;
 	string entrada;
 	
-	Nome* nome = new Nome();
-	Identificador* identificador = new Identificador();
-	Senha* senha = new Senha();
+	Nome *nome = new Nome();
+	Identificador *identificador = new Identificador();
+	Senha *senha = new Senha();
 
 	cout << "_________________________" << endl;
-	cout << "Cadastramento de Usuário." << endl;
-	cout << CONTINUAR << " - Continuar" << endl;
+	cout << "Cadastramento de Usuario." << endl;
+	cout << CONTINUAR << " - Deseja prosseguir com o cadastramento?" << endl;
 	cout << VOLTAR << " - Voltar" << endl;
+	cout << "Selecione uma opcao : ";
+
 	getline(cin, opcao);
 
 	switch(stoi(opcao)){
 		case CONTINUAR:
-			cout << "Nome: ";
+			cout << "Digite seu nome: ";
 			getline(cin, entrada);
 			nome->setNome(entrada);
 
-			cout << "Identificador: ";
+			cout << "Digite seu identificador. Ele sera usado para acessar sua conta.: ";
 			getline(cin, entrada);
 			identificador->setIdentificador(entrada);
 
-			cout << "Senha: ";
+			cout << "Digite sua senha: ";
 			getline(cin, entrada);
 			senha->setSenha(entrada);
 
-			// resultado = 0;//chama cadastrar no serviço
+			resultado = servidor->cadastrar(nome, identificador, senha); //chama cadastrar no serviço
+
+			if (resultado == SUCESSO){
+				cout << "Usuario cadastrado com sucesso!" << endl;
+			}
+			else if (resultado == FALHA){
+				cout << "Falha no cadastramento. Tente novamente mais tarde." << endl; 
+			}
+			else if (resultado == USUARIO_JA_CADASTRADO){
+				cout << "Identificador ja utilizado por outro usuario." << endl;
+			}
+
 			break;
 
 		case VOLTAR:
@@ -317,48 +364,52 @@ int CntrAprUsuario :: cadastrar(Identificador *id) throw(runtime_error) {
 	return resultado;
 }
 
-int CntrAprUsuario :: executar (Identificador* id) throw (runtime_error){
+int CntrAprUsuario :: executar (Identificador *id) throw (runtime_error){
 	string opcao;
 	int resultado;
 	bool opcaoInvalida = false;
-	
-	id->setIdentificador("pedro"); // Apagar depois
 
-	IAprAutenticacao* cntr = new CntrAprAutenticacao();
-	// IServAutenticacao* servidorAutenticacao = new CntrServAutenticacao();
+	IAprAcomodacao *cntrAcomodacao = new CntrAprAcomodacao();
+	IServAcomodacao *servidorAcomodacao = new CntrServAcomodacao();
+	
+	cntrAcomodacao->setServidor(servidorAcomodacao);
 
 	while(true){
 		cout << endl << "Painel Principal" << endl << endl;
 		cout << CONTA << " - Minha conta" << endl;
-		cout << PESQUISAR << " - Pesquisar acomodações" << endl;
-		cout << ACOMODACAO << " - Painel de Acomodações" << endl;
+		cout << PESQUISAR << " - Pesquisar Acomodacoes" << endl;
+		cout << ACOMODACAO << " - Painel de Acomodacoes" << endl;
 		cout << SAIR << " - Sair" << endl;
+		cout << "Selecione uma opcao : ";
 
 		getline(cin, opcao);
+		
+		if(opcao.size() != 0){
+			switch(stoi(opcao)){
+				case CONTA:
+					resultado = painelConta(id);
+					break;
 
-		switch(stoi(opcao)){
-			case CONTA:
-				resultado = painelConta(id);
-				break;
+				case PESQUISAR:
+					resultado = cntrAcomodacao->consultar(id);
+					break;
+				
+				case ACOMODACAO:
+					resultado = cntrAcomodacao->executar(id);
+					break;
 
-			case PESQUISAR:
+				case SAIR:
+					break;
 
-				break;
-			
-			case ACOMODACAO:
-
-				break;
-
-			case SAIR:
-				break;
-
-			default:
-				cout << "Opção inválida" << endl;
+				default:
+					cout << "Opcao Invalida" << endl;
+					break;
+			}
+		
+		
+			if(stoi(opcao) == SAIR){
 				break;
 			}
-
-		if(stoi(opcao) == SAIR){
-			break;
 		}
 		
 	}
@@ -366,7 +417,33 @@ int CntrAprUsuario :: executar (Identificador* id) throw (runtime_error){
 	return resultado;
 }
 
+// **********************************************************************************
 // Classe CntrAprAcomodacao
+
+int CntrAprAcomodacao :: consultar(Identificador *id){
+	int resultado;
+	string entrada;
+	Data* dataInicio = new Data();
+	Data* dataTermino = new Data();
+
+	try{
+		cout << endl << "Janela de Pesquisa de Acomodacoes" << endl << endl;
+
+		cout << "Digite a data de início do intervalo de pesquisa: " << endl;
+		getline(cin, entrada);
+		dataInicio->setData(entrada);
+		cout << "Digite a data final do intervalo de pesquisa: " << endl;
+		getline(cin, entrada);
+		dataTermino->setData(entrada);
+	}
+	catch (const invalid_argument &exp) {
+		cout << endl << "Formato invalido! Tente novamente." << endl;
+	}
+
+	resultado = servidor->consultar(id, dataInicio, dataTermino);
+	
+	return resultado;
+}
 
 int CntrAprAcomodacao :: executar(Identificador *id) {
 	int opcao;
@@ -374,21 +451,30 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 
 	while(true){
 
-		cout << endl << "Acomodacao:" << endl << endl;
+		cout << endl << "Painel de Acomodacao:" << endl << endl;
 
-        cout << "Cadastrar Acomodacao         - " << CADASTRAR_ACOMODACAO << endl;
-        cout << "Descadastrar Acomodacao      - " << DESCADASTRAR_ACOMODACAO << endl;
-        cout << "Reservar Acomodacao          - " << RESERVAR_ACOMODACAO << endl;
-        cout << "Cancelar Reserva             - " << CANCELAR_RESERVA << endl;
-        cout << "Cadastrar Disponibilidade    - " << CADASTRAR_DISPONIBILIDADE << endl;
-        cout << "Descadastrar Disponibilidade - " << DESCADASTRAR_DISPONIBILIDADE << endl;
-        cout << "Retornar                     - " << RETORNAR << endl << endl;
-        cout << "Selecione uma opcao :";
+        cout << CADASTRAR_ACOMODACAO << " - Cadastrar Acomodacao         - " << endl;
+        cout << DESCADASTRAR_ACOMODACAO << " - Descadastrar Acomodacao      - " << endl;
+        cout << RESERVAR_ACOMODACAO << " - Reservar Acomodacao          - " << endl;
+        cout << CANCELAR_RESERVA << " - Cancelar Reserva             - " << endl;
+        cout << CADASTRAR_DISPONIBILIDADE << " - Cadastrar Disponibilidade    - " << endl;
+        cout << DESCADASTRAR_DISPONIBILIDADE << " - Descadastrar Disponibilidade - " << endl;
+        cout << RETORNAR << " - Retornar                     - " << endl << endl;
+        cout << "Selecione uma opcao : ";
 
         cin >> opcao;
 
         switch(opcao){
             case CADASTRAR_ACOMODACAO:          resultado = cadastrar(id);
+            									if(resultado == SUCESSO){
+													cout << "Acomodacao cadastrada com sucesso!" << endl;
+												}
+												else if(resultado == ACOMODACAO_JA_CADASTRADA){
+													cout << "Ja existe uma acomodacao associada a sua conta." << endl;
+												}
+												else if(resultado == FALHA){
+													cout << "Erro no cadastramento de acomodacao." << endl;
+												}
                                                 return resultado;
                                                 break;
             case DESCADASTRAR_ACOMODACAO:       resultado = descadastrar(id);
@@ -432,22 +518,22 @@ int CntrAprAcomodacao :: cadastrar(Identificador *id) throw(runtime_error) {
 
         try{
             cout << "Digite seu ID: " << endl; //pedro
-            cin >> entrada;
+            getline(cin, entrada);
             id->setIdentificador(entrada);
             cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             tipo->setTipoDeAcomodacao(entrada);
             cout << "Digite a capacidade de acomodacao (1 a 9): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             capacidade->setCapacidade(stoi(entrada));
             cout << "Digite o valor da diaria: (R$ 1,00 a R$ 10.000,00)" << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             preco->setDiaria(stof(entrada));
             cout << "Digite o Estado onde se encontra a acomodacao (sigla): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             estado->setEstado(entrada);
             cout << "Digite a cidade onde se encontra a acomodacao: " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             cidade->setNome(entrada);
             break;
         }
@@ -457,7 +543,7 @@ int CntrAprAcomodacao :: cadastrar(Identificador *id) throw(runtime_error) {
 
     }
 
-    //Solicitar autenticacao
+    //Solicitar autentservidoricacao
     
     resultado = servidor->cadastrar(id, tipo, capacidade, preco, estado, cidade);
 
@@ -489,23 +575,23 @@ int CntrAprAcomodacao :: descadastrar(Identificador *id) throw(runtime_error){
         cout << endl << "Descadastro de Acomodacao." << endl << endl;
 
         try{
-            cout << "Digite seu ID: " << endl; //pedro
-            cin >> entrada;
+            cout << "Digite seu ID: " << endl;
+            getline(cin, entrada);
             id->setIdentificador(entrada);
             cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             tipo->setTipoDeAcomodacao(entrada);
             cout << "Digite a capacidade de acomodacao (1 a 9): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             capacidade->setCapacidade(stoi(entrada));
             cout << "Digite o valor da diaria: (R$ 1,00 a R$ 10.000,00)" << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             preco->setDiaria(stof(entrada));
             cout << "Digite o Estado onde se encontra a acomodacao (sigla): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             estado->setEstado(entrada);
             cout << "Digite a cidade onde se encontra a acomodacao: " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             cidade->setNome(entrada);
             break;
         }
@@ -545,16 +631,16 @@ int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
 
         try{
             cout << "Digite seu ID: " << endl; //pedro
-            cin >> entrada;
+            getline(cin, entrada);
             id->setIdentificador(entrada);
             cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             tipo->setTipoDeAcomodacao(entrada);
             cout << "Digite a data de inicio da reserva (DD/MMM/AAAA): " << endl; // 30/jan/2018
-            cin >> entrada;
+            getline(cin, entrada);
             dataInicio->setData(entrada);
             cout << "Digite a data de termino da reserva (DD/MMM/AAAA): " << endl; 
-            cin >> entrada;
+            getline(cin, entrada);
             dataTermino->setData(entrada);
             break;
         }
@@ -592,16 +678,16 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 
         try{
             cout << "Digite seu ID: " << endl; //pedro
-            cin >> entrada;
+            getline(cin, entrada);
             id->setIdentificador(entrada);
             cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             tipo->setTipoDeAcomodacao(entrada);
             cout << "Digite a data de inicio da reserva (DD/MMM/AAAA): " << endl; // 30/jan/2018
-            cin >> entrada;
+            getline(cin, entrada);
             dataInicio->setData(entrada);
             cout << "Digite a data de termino da reserva (DD/MMM/AAAA): " << endl; 
-            cin >> entrada;
+            getline(cin, entrada);
             dataTermino->setData(entrada);
             break;
         }
@@ -639,13 +725,13 @@ int CntrAprAcomodacao :: cadastrarDisp() throw(runtime_error){
 
         try{
             cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-            cin >> entrada;
+            getline(cin, entrada);
             tipo->setTipoDeAcomodacao(entrada);
             cout << "Digite a data de inicio da disponibilidade (DD/MMM/AAAA): " << endl; // 30/jan/2018
-            cin >> entrada;
+            getline(cin, entrada);
             dataInicio->setData(entrada);
             cout << "Digite a data de termino da disponibilidade (DD/MMM/AAAA): " << endl; 
-            cin >> entrada;
+            getline(cin, entrada);
             dataTermino->setData(entrada);
             break;
         }
@@ -654,8 +740,6 @@ int CntrAprAcomodacao :: cadastrarDisp() throw(runtime_error){
         }
 
     }
-
-    //Solicitar autenticacao
     
     resultado = servidor->cadastrarDisp(tipo, dataInicio, dataTermino);
 
@@ -697,8 +781,6 @@ int CntrAprAcomodacao :: descadastrarDisp() throw(runtime_error){
         }
 
     }
-
-    //Solicitar autenticacao
     
     resultado = servidor->descadastrarDisp(tipo, dataInicio, dataTermino);
 
@@ -707,6 +789,4 @@ int CntrAprAcomodacao :: descadastrarDisp() throw(runtime_error){
     delete tipo;
 
     return resultado;
-
-
 }
