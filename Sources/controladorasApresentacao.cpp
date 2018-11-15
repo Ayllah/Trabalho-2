@@ -258,9 +258,7 @@ int CntrAprUsuario :: cadastrarCartaoDeCredito(Identificador *id) throw(runtime_
 	}
 
 	resultado = servidor->cadastrarCartaoDeCredito(id, cartao, dataDeValidade);
-	if(resultado == SUCESSO){
-		cout << "resultado == sucesso" << endl;
-	}
+	
 	return resultado;
 }
 
@@ -402,6 +400,7 @@ int CntrAprUsuario :: executar (Identificador *id) throw (runtime_error){
 	return resultado;
 }
 
+// **********************************************************************************
 // Classe CntrAprAcomodacao
 
 int CntrAprAcomodacao :: consultar(Identificador *id){
@@ -715,8 +714,6 @@ int CntrAprAcomodacao :: cadastrarDisp() throw(runtime_error){
         }
 
     }
-
-    //Solicitar autenticacao
     
     resultado = servidor->cadastrarDisp(tipo, dataInicio, dataTermino);
 
@@ -758,8 +755,6 @@ int CntrAprAcomodacao :: descadastrarDisp() throw(runtime_error){
         }
 
     }
-
-    //Solicitar autenticacao
     
     resultado = servidor->descadastrarDisp(tipo, dataInicio, dataTermino);
 
@@ -768,6 +763,4 @@ int CntrAprAcomodacao :: descadastrarDisp() throw(runtime_error){
     delete tipo;
 
     return resultado;
-
-
 }

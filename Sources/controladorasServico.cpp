@@ -40,9 +40,13 @@ void ContainerUsuario::desconectar() throw (EErroPersistencia) {
 
 void ContainerUsuario::executar() throw (EErroPersistencia) {
         conectar();
-
+		cout << containerUsuario << endl;
         rc = sqlite3_exec(bd, containerUsuario.c_str(), callback, 0, &mensagem);
-        
+        cout << "Digite s para imprimir mensagem" << endl;
+		char c = getchar();
+		if (c == 's')
+			cout << mensagem << endl;
+
         if(rc != SQLITE_OK){
 		        if (mensagem){
                 	free(mensagem);
@@ -147,11 +151,39 @@ Usuario ComandoPesquisarUsuario :: getResultado() throw (EErroPersistencia){
 }
 
 //---------------------------------------------------------------------------
+// Classe ComandoCadastrarContaCorrente.
+
+ComandoCadastrarContaCorrente :: ComandoCadastrarContaCorrente(Identificador id, ContaCorrente contaCorrente){
+	cout << "Antes de set" << containerUsuario << endl;
+	cout << "Banco aqui: " << contaCorrente.getBancoContaCorrente().getBanco() << endl;
+	cout << "ID:" << id.getIdentificador() << endl;
+
+	containerUsuario = "UPDATE Usuarios ";
+	containerUsuario += "SET NumeroConta = '" + contaCorrente.getNumeroContaCorrente().getNumeroDeContaCorrente();
+	containerUsuario += "', Agencia = '" + contaCorrente.getAgenciaContaCorrente().getAgencia();
+	containerUsuario += "', Banco = '" + contaCorrente.getBancoContaCorrente().getBanco();
+	containerUsuario += "' WHERE Identificador = ";
+	containerUsuario += '\'' + id.getIdentificador() + '\'';
+	cout << "Apos set" << containerUsuario << endl;
+}
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarCartaoDeCredito.
+
+ComandoCadastrarCartaoDeCredito :: ComandoCadastrarCartaoDeCredito(Identificador id, CartaoDeCredito cartaoDeCredito){
+	containerUsuario = "UPDATE Usuarios ";
+	containerUsuario += "SET NumeroCartao = '" + cartaoDeCredito.getNumeroCartaoCredito().getNumeroDeCartaoDeCredito();
+	containerUsuario += "', ValidadeCartao = '" + cartaoDeCredito.getDataDeValidadeCartaoDeCredito().getDataDeValidade();
+	containerUsuario += "' WHERE Identificador = ";
+	containerUsuario += '\'' + id.getIdentificador() + '\'';
+}
+
+//---------------------------------------------------------------------------
 //Classe Controle Servico Autenticacao.
 
 int CntrServAutenticacao :: autenticar(Identificador *id, Senha *senha){
 	int resultado;
-	ContainerUsuario* container = new ContainerUsuario();
+	// ContainerUsuario* container = new ContainerUsuario();
 	string senha_recuperada;
 	ComandoLerSenha comandoLerSenha(id);
 
@@ -227,13 +259,45 @@ int CntrServUsuario :: descadastrarUsuario(Identificador* id){
 }
 
 int CntrServUsuario :: cadastrarContaCorrente(Identificador* id, NumeroDeContaCorrente* conta, Agencia* agencia, Banco* banco){
+	ContaCorrente contaCorrente;
+
+	contaCorrente.setNumeroContaCorrente(*conta);
+	contaCorrente.setAgenciaContaCorrente(*agencia);
+	contaCorrente.setBancoContaCorrente(*banco);
+
+	// Se já tem uma conta corrente cadastrada, sobrescreve
+
+	ComandoCadastrarContaCorrente comando (*id, contaCorrente);
+
+	try{
+		comando.executar();
+		return SUCESSO;
+	}
+	catch (EErroPersistencia){
+		cout << "Erro no cadastro" << endl;
+		return FALHA;
+	}
 }
 
 int CntrServUsuario :: descadastrarContaCorrente(Identificador* id){
 }
 
 int CntrServUsuario :: cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade){
+	CartaoDeCredito cartaoDeCredito;
 
+	cartaoDeCredito.setNumeroCartaoCredito(*cartao);
+	cartaoDeCredito.setDataDeValidadeCartaoDeCredito(*dataDeValidade);
+
+	ComandoCadastrarCartaoDeCredito comando (*id, cartaoDeCredito);
+
+	try{
+		comando.executar();
+		return SUCESSO;
+	}
+	catch (EErroPersistencia){
+		cout << "Erro no cadastro" << endl;
+		return FALHA;
+	}
 }
 
 int CntrServUsuario :: descadastrarCartaoDeCredito(Identificador* id){

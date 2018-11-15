@@ -90,6 +90,22 @@ class ComandoPesquisarUsuario : public ContainerUsuario {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoCadastrarContaCorrente.
+
+class ComandoCadastrarContaCorrente : public ContainerUsuario {
+	public:
+		ComandoCadastrarContaCorrente(Identificador, ContaCorrente);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarCartaoDeCredito.
+
+class ComandoCadastrarCartaoDeCredito : public ContainerUsuario {
+	public:
+		ComandoCadastrarCartaoDeCredito(Identificador, CartaoDeCredito);
+};
+
+//---------------------------------------------------------------------------
 // Classe Controladora Autenticacao
 
 class CntrServAutenticacao : public IServAutenticacao {
