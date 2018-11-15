@@ -29,7 +29,9 @@ public:
 class CntrAprUsuario : public IAprUsuario {
 private:
 	IServUsuario *servidor;
-	// IAprAutenticacao *cntrAutenticacao;
+	
+	IAprAutenticacao *cntrAutenticacao;
+	IAprAcomodacao *cntrAcomodacao;
 
 	const static int CONTA = 1;
 	const static int PESQUISAR = 2;
@@ -60,7 +62,7 @@ private:
 
 public:
 	int cadastrar(Identificador *id) throw(runtime_error);
-	int executar(Identificador* id) throw(runtime_error);
+	int executar(Identificador *id) throw(runtime_error);
 
 	void setServidor(IServUsuario *servidor){
 		this->servidor = servidor;
@@ -99,7 +101,7 @@ public:
 	 // Método previsto na interface por meio do qual é solicitada execução da controladora.
 
     int executar(Identificador *id);
-
+	int consultar(Identificador *id);
     // Método por meio do qual é estabelecido relacionamento com o servidor.
 
     void setServidor(IServAcomodacao *servidor){

@@ -4,20 +4,83 @@
 #include "interfacesApresentacao.h"
 #include "interfacesServico.h"
 #include "dominios.h"
+#include "sqlite3.h"
 
 #include <stdexcept>
 #include <iostream>
+#include <string>
 #include <cstdlib>
+#include <list>
 
 using namespace std;
 
+//classe EErroPersistencia
+
+class EErroPersistencia {
+private:
+        string mensagem;
+public:
+        EErroPersistencia(string);
+        string what();
+};
+
+//classe ElementoResultado
+
+class ElementoResultado {
+private:
+        string nomeColuna;
+        string valorColuna;
+public:
+        void setNomeColuna(const string&);
+        string getNomeColuna() const {
+        	return nomeColuna;
+        }
+        void setValorColuna(const string&);
+        string getValorColuna() const{
+        	return valorColuna;
+        }
+};
+
+//classe ContainerUsuario
+
+class ContainerUsuario {
+private:
+	const char *nomeBancoDados;
+    sqlite3 *bd;
+    char *mensagem;
+    int rc;
+    void conectar() throw (EErroPersistencia);
+    void desconectar() throw (EErroPersistencia);
+    static int callback(void *, int, char **, char **);
+
+protected:
+        static list<ElementoResultado> listaResultado;
+        string containerUsuario;
+public:
+	ContainerUsuario() {
+		//Informa o nome do banco de dados.
+             nomeBancoDados = "BaseDeDados";
+	}
+	
+	void executar() throw (EErroPersistencia);
+};
+
+// Classe ComandoLerSenha.
+class ComandoLerSenha : public ContainerUsuario {
+	public:
+		ComandoLerSenha(Identificador*);
+		string getResultado() throw (EErroPersistencia);
+};
+
+//classe Controladora Usuario
+
 class CntrServAutenticacao : public IServAutenticacao {
+private:
+	const static int SUCESSO = 0;
+	const static int FALHA = -1;
+
 public:
 	int autenticar(Identificador* id, Senha* senha);
-
-	const static int SUCESSO =  0;
-    const static int FALHA   = -1;
-
 };
 
 class CntrServUsuario : public IServUsuario {
@@ -43,6 +106,7 @@ class CntrServAcomodacao : public IServAcomodacao {
 public:
 
 	int cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
+	int consultar(Identificador *id, Data *dataInicio, Data *dataTermino);
 	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
 	int reservar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
 	int cancelar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
@@ -51,8 +115,6 @@ public:
 
 	const static int SUCESSO =  0;
     const static int FALHA   = -1;
-	
-
 };
 
 

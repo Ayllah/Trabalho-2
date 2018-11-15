@@ -12,16 +12,10 @@
 
 using namespace std;
 
-const static int SUCESSO =  0;
-const static int SAIR = 0;
-
-int main()
-{
+int main(){
 	CntrMIC *cntr = new CntrMIC();
+	
 	cntr->menu();
-		// resultado = cntr->
+
 	return 0;
 }
-
-// Acrescentar o texto "Selecione uma opção" nos menus
-//Colocar a parte de acomodacao na "Minha conta"

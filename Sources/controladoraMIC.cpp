@@ -21,7 +21,6 @@ void CntrMIC :: entrar(){
     resultado = cntrAutenticar->autenticar(id);
 
     if(resultado == SUCESSO){
-        cout<< "Parabens!" << endl;
         cntrUsuario->executar(id);
     }
     else{
@@ -48,6 +47,7 @@ void CntrMIC :: cadastrar(){
 
 void CntrMIC :: menu(){
     string opcao;
+    
     inicializar();
 	
 	while(!SAIR){

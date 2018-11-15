@@ -35,6 +35,7 @@ class IServAcomodacao{
 		// Métodos por meio dos quais são solicitados serviços.
 
 		virtual int cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade) = 0;
+		virtual int consultar(Identificador *id, Data *dataInicio, Data *dataTermino) = 0;
 		virtual int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade) = 0;
 		virtual int reservar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino) = 0;
 		virtual int cancelar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino) = 0;
