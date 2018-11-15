@@ -65,6 +65,7 @@ public:
 	void executar() throw (EErroPersistencia);
 };
 
+//---------------------------------------------------------------------------
 // Classe ComandoLerSenha.
 class ComandoLerSenha : public ContainerUsuario {
 	public:
@@ -72,7 +73,15 @@ class ComandoLerSenha : public ContainerUsuario {
 		string getResultado() throw (EErroPersistencia);
 };
 
-//classe Controladora Usuario
+//Classe ComandoCadastrarAluno.
+
+class ComandoCadastrarUsuario : public ContainerUsuario {
+public:
+        ComandoCadastrarUsuario(Usuario);
+};
+
+//---------------------------------------------------------------------------
+// Classe Controladora Autenticacao
 
 class CntrServAutenticacao : public IServAutenticacao {
 private:
@@ -82,6 +91,9 @@ private:
 public:
 	int autenticar(Identificador* id, Senha* senha);
 };
+
+//---------------------------------------------------------------------------
+// Classe Controladora Usuario
 
 class CntrServUsuario : public IServUsuario {
 private:

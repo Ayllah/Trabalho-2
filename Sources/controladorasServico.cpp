@@ -66,6 +66,7 @@ int ContainerUsuario::callback(void *NotUsed, int argc, char **valorColuna, char
       return 0;
 }
 
+
 ComandoLerSenha :: ComandoLerSenha(Identificador *id) {
 	containerUsuario = "SELECT Senha FROM Usuarios WHERE Identificador = ";
     containerUsuario += '\'' + id->getIdentificador() + '\'';
@@ -86,6 +87,19 @@ string ComandoLerSenha :: getResultado() throw (EErroPersistencia){
     return senha_recuperada;
 
 }
+
+//---------------------------------------------------------------------------
+//Classe ComandoCadastrarUsuario.
+
+ComandoCadastrarUsuario :: ComandoCadastrarUsuario(Usuario usuario) {
+	containerUsuario = "INSERT INTO Usuarios VALUES (";
+	containerUsuario += "'" + usuario.getNomeUsuario().getNome() + "', ";
+	containerUsuario += "'" + usuario.getIdentificadorUsuario().getIdentificador() + "', ";
+	containerUsuario += "'" + usuario.getSenhaUsuario().getSenha() + "' , null, null, null, null, null)";
+}
+
+//---------------------------------------------------------------------------
+//Classe Controle Servico Autenticacao.
 
 int CntrServAutenticacao :: autenticar(Identificador *id, Senha *senha){
 	int resultado;
@@ -114,8 +128,29 @@ int CntrServAutenticacao :: autenticar(Identificador *id, Senha *senha){
 	return resultado;
 }
 
-int CntrServUsuario :: cadastrar(Nome* nome, Identificador* identificador, Senha* senha){
+//---------------------------------------------------------------------------
+//Classe Controle Servico Usuario.
 
+int CntrServUsuario :: cadastrar(Nome* nome, Identificador* identificador, Senha* senha){
+	Usuario usuario;
+
+	usuario.setNomeUsuario(*nome);
+	usuario.setIdentificadorUsuario(*identificador);
+	usuario.setSenhaUsuario(*senha);
+
+	// Verificar se a id já está cadastrada
+	
+	ComandoCadastrarUsuario comando (usuario);
+	
+	try{
+		comando.executar();
+	}
+	catch (EErroPersistencia){
+		cout << "Erro" << endl;
+		return FALHA;
+	}
+
+	return SUCESSO;
 }
 
 int CntrServUsuario :: descadastrarUsuario(Identificador* id){

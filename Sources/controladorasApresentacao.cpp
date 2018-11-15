@@ -325,7 +325,15 @@ int CntrAprUsuario :: cadastrar(Identificador *id) throw(runtime_error) {
 			getline(cin, entrada);
 			senha->setSenha(entrada);
 
-			// resultado = 0;//chama cadastrar no serviço
+			resultado = servidor->cadastrar(nome, identificador, senha); //chama cadastrar no serviço
+
+			if (resultado == SUCESSO){
+				cout << "Usuario cadastrado com sucesso!" << endl;
+			}
+			else if (resultado == FALHA){
+				cout << "Falha no cadastramento. Tente novamente mais tarde." << endl; 
+			}
+			
 			break;
 
 		case VOLTAR:
