@@ -73,11 +73,20 @@ class ComandoLerSenha : public ContainerUsuario {
 		string getResultado() throw (EErroPersistencia);
 };
 
-//Classe ComandoCadastrarAluno.
+//Classe ComandoCadastrarUsuario.
 
 class ComandoCadastrarUsuario : public ContainerUsuario {
 public:
         ComandoCadastrarUsuario(Usuario);
+};
+
+//---------------------------------------------------------------------------
+//Classe ComandoPesquisarUsuario.
+
+class ComandoPesquisarUsuario : public ContainerUsuario {
+	public:
+		ComandoPesquisarUsuario(Identificador);
+		Usuario getResultado() throw (EErroPersistencia);
 };
 
 //---------------------------------------------------------------------------
@@ -100,7 +109,11 @@ private:
 
 	const static char SIM = 'S';
 	const static char NAO = 'N';
-
+	const static int DESISTENCIA = 2;
+	const static int USUARIO_JA_CADASTRADO = 1;
+	const static int SUCESSO = 0;
+	const static int FALHA = -1;
+	
 public:
 	int cadastrar(Nome* nome, Identificador* id, Senha* senha);
 	int descadastrarUsuario(Identificador* id);
@@ -108,10 +121,6 @@ public:
 	int descadastrarContaCorrente(Identificador* id);
 	int cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade);
 	int descadastrarCartaoDeCredito(Identificador* id);
-
-	const static int DESISTENCIA = 2;
-	const static int SUCESSO = 0;
-	const static int FALHA = -1;
 };
 
 class CntrServAcomodacao : public IServAcomodacao {

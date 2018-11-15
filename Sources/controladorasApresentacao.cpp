@@ -21,6 +21,7 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 			cout << "Digite sua senha: " << endl; //1a3A567$
 			getline(cin, entrada);
 			senha->setSenha(entrada);
+
 			break;
 		}
 		catch (const invalid_argument &exp) {
@@ -29,7 +30,6 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 	}
 
 	//Solicitar autenticacao
-
 	resultado = servidor->autenticar(id,senha);
 
 	return resultado;
@@ -313,15 +313,15 @@ int CntrAprUsuario :: cadastrar(Identificador *id) throw(runtime_error) {
 
 	switch(stoi(opcao)){
 		case CONTINUAR:
-			cout << "Nome: ";
+			cout << "Digite seu nome: ";
 			getline(cin, entrada);
 			nome->setNome(entrada);
 
-			cout << "Identificador: ";
+			cout << "Digite seu identificador. Ele sera usado para acessar sua conta.: ";
 			getline(cin, entrada);
 			identificador->setIdentificador(entrada);
 
-			cout << "Senha: ";
+			cout << "Digite sua senha: ";
 			getline(cin, entrada);
 			senha->setSenha(entrada);
 
@@ -333,7 +333,10 @@ int CntrAprUsuario :: cadastrar(Identificador *id) throw(runtime_error) {
 			else if (resultado == FALHA){
 				cout << "Falha no cadastramento. Tente novamente mais tarde." << endl; 
 			}
-			
+			else if (resultado == USUARIO_JA_CADASTRADO){
+				cout << "Identificador ja utilizado por outro usuario." << endl;
+			}
+
 			break;
 
 		case VOLTAR:
@@ -547,7 +550,7 @@ int CntrAprAcomodacao :: descadastrar(Identificador *id) throw(runtime_error){
         cout << endl << "Descadastro de Acomodacao." << endl << endl;
 
         try{
-            cout << "Digite seu ID: " << endl; //pedro
+            cout << "Digite seu ID: " << endl;
             getline(cin, entrada);
             id->setIdentificador(entrada);
             cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;

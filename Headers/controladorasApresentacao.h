@@ -48,6 +48,14 @@ private:
 	const static char SIM = 'S';
 	const static char NAO = 'N';
 
+	const static int VOLTAR = 0;
+	const static int CONTINUAR = 1;
+
+	const static int DESISTENCIA = 2;
+	const static int USUARIO_JA_CADASTRADO = 1;
+	const static int SUCESSO = 0;
+	const static int FALHA = -1;
+
 	int painelConta(Identificador *id) throw(runtime_error);
 	//int editarUsuario(Identificador *id) throw(runtime_error);
 	int descadastrarUsuario(Identificador *id) throw(runtime_error);
@@ -67,13 +75,6 @@ public:
 	void setServidor(IServUsuario *servidor){
 		this->servidor = servidor;
 	}
-
-	const static int VOLTAR = 0;
-	const static int CONTINUAR = 1;
-	
-	const static int DESISTENCIA = 2;
-	const static int SUCESSO = 0;
-	const static int FALHA = -1;
 };
 
 class CntrAprAcomodacao : public IAprAcomodacao {
