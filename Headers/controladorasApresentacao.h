@@ -101,6 +101,9 @@ private:
     const static int DESCADASTRAR_DISPONIBILIDADE = 6;
     const static int RETORNAR = 0;
 
+	const static int ACOMODACAO_JA_TEM_DISPONIBILIDADE = 6;
+	const static int ACOMODACAO_NAO_PERTECE_USUARIO = 5;
+	const static int ID_ACOMODACAO_JA_UTILIZADO = 4;
 	const static int CONTA_CORRENTE_AUSENTE = 3;
 
 	IServAcomodacao *servidor;
@@ -109,8 +112,8 @@ private:
     int descadastrar(Identificador *id) throw(runtime_error);
     int reservar(Identificador *id) throw(runtime_error);
     int cancelar(Identificador *id) throw(runtime_error);
-    int cadastrarDisp() throw(runtime_error);
-    int descadastrarDisp() throw(runtime_error);
+    int cadastrarDisp(Identificador *id) throw(runtime_error);
+    int descadastrarDisp(Identificador *id) throw(runtime_error);
 
 public:
 

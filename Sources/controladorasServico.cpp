@@ -4,7 +4,10 @@
 
 list<ElementoResultado> ContainerUsuario::listaResultado;
 list<ElementoResultado> ContainerAcomodacao::listaResultado;
-//classe EErroPersistencia
+list<ElementoResultado> ContainerDisponibilidade::listaResultado;
+list<ElementoResultado> ContainerReserva::listaResultado;
+
+// Classe EErroPersistencia
 
 EErroPersistencia :: EErroPersistencia(string mensagem){
         this->mensagem = mensagem;
@@ -106,6 +109,98 @@ void ContainerAcomodacao :: executar() throw (EErroPersistencia) {
 }
 
 int ContainerAcomodacao::callback(void *NotUsed, int argc, char **valorColuna, char **nomeColuna){
+      NotUsed = 0;
+      ElementoResultado elemento;
+      int i;
+      for(i = 0; i < argc; i++){
+        elemento.setNomeColuna(nomeColuna[i]);
+        elemento.setValorColuna(valorColuna[i] ? valorColuna[i]: "NULL");
+        listaResultado.push_front(elemento);
+      }
+      return 0;
+}
+
+// ---------------------------------------------------------------------
+// Classe ContainerDisponibilidade
+
+void ContainerDisponibilidade :: conectar() throw (EErroPersistencia) {
+      rc = sqlite3_open(nomeBancoDados, &bd);
+      if( rc != SQLITE_OK )
+        throw EErroPersistencia("Erro na conexao ao banco de dados");
+}
+
+void ContainerDisponibilidade :: desconectar() throw (EErroPersistencia) {
+      rc =  sqlite3_close(bd);
+      if( rc != SQLITE_OK )
+        throw EErroPersistencia("Erro na desconexao ao banco de dados");      
+}
+
+void ContainerDisponibilidade :: executar() throw (EErroPersistencia) {
+        conectar();
+		cout << containerDisponibilidade << endl;
+        rc = sqlite3_exec(bd, containerDisponibilidade.c_str(), callback, 0, &mensagem);
+        cout << "Digite s para imprimir mensagem" << endl;
+		char c = getchar();
+		if (c == 's')
+			cout << mensagem << endl;
+
+        if(rc != SQLITE_OK){
+		        if (mensagem){
+                	free(mensagem);
+                }
+                throw EErroPersistencia("Erro na execucao do comando SQL");
+        } 
+        
+		desconectar();
+}
+
+int ContainerDisponibilidade::callback(void *NotUsed, int argc, char **valorColuna, char **nomeColuna){
+      NotUsed = 0;
+      ElementoResultado elemento;
+      int i;
+      for(i = 0; i < argc; i++){
+        elemento.setNomeColuna(nomeColuna[i]);
+        elemento.setValorColuna(valorColuna[i] ? valorColuna[i]: "NULL");
+        listaResultado.push_front(elemento);
+      }
+      return 0;
+}
+
+// ---------------------------------------------------------------------
+// Classe ContainerReserva
+
+void ContainerReserva :: conectar() throw (EErroPersistencia) {
+      rc = sqlite3_open(nomeBancoDados, &bd);
+      if( rc != SQLITE_OK )
+        throw EErroPersistencia("Erro na conexao ao banco de dados");
+}
+
+void ContainerReserva :: desconectar() throw (EErroPersistencia) {
+      rc =  sqlite3_close(bd);
+      if( rc != SQLITE_OK )
+        throw EErroPersistencia("Erro na desconexao ao banco de dados");      
+}
+
+void ContainerReserva :: executar() throw (EErroPersistencia) {
+        conectar();
+		cout << containerReserva << endl;
+        rc = sqlite3_exec(bd, containerReserva.c_str(), callback, 0, &mensagem);
+        cout << "Digite s para imprimir mensagem" << endl;
+		char c = getchar();
+		if (c == 's')
+			cout << mensagem << endl;
+
+        if(rc != SQLITE_OK){
+		        if (mensagem){
+                	free(mensagem);
+                }
+                throw EErroPersistencia("Erro na execucao do comando SQL");
+        } 
+        
+		desconectar();
+}
+
+int ContainerReserva::callback(void *NotUsed, int argc, char **valorColuna, char **nomeColuna){
       NotUsed = 0;
       ElementoResultado elemento;
       int i;
@@ -325,13 +420,88 @@ CartaoDeCredito ComandoPesquisarCartaoDeCredito :: getResultado() throw (EErroPe
 
 ComandoCadastrarAcomodacao :: ComandoCadastrarAcomodacao(Identificador identificador, Acomodacao acomodacao){
 	containerAcomodacao = "INSERT INTO Acomodacoes VALUES (";
-	// IDENTIFICADOR_acoMODACAO
+	containerAcomodacao += "'" + acomodacao.getIdentificadorAcomodacao().getIdentificador() + "', ";
 	containerAcomodacao += "'" + identificador.getIdentificador() + "', ";
 	containerAcomodacao += "'" + acomodacao.getTipoAcomodacao().getTipoDeAcomodacao() + "', ";
 	containerAcomodacao += "'" + to_string(acomodacao.getCapacidadeAcomodacao().getCapacidade()) + "', ";
 	containerAcomodacao += "'" + acomodacao.getNomeCidadeAcomodacao().getNome() + "', ";
 	containerAcomodacao += "'" + acomodacao.getEstadoAcomodacao().getEstado() + "', ";
-	containerAcomodacao += "'" + to_string(acomodacao.getDiariaAcomodacao().getDiaria()) + "', null, null, null, null)";
+	containerAcomodacao += "'" + to_string(acomodacao.getDiariaAcomodacao().getDiaria()) + "')";
+}
+
+//---------------------------------------------------------------------------
+// Classe ComandoVerificaExclusividadeIdentificadorAcomodacao
+
+ComandoVerificaExclusividadeIdentificadorAcomodacao :: ComandoVerificaExclusividadeIdentificadorAcomodacao (Identificador idAcomodacao){
+	containerAcomodacao = "SELECT Identificador FROM Acomodacoes WHERE Identificador = ";
+	containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
+};
+
+bool ComandoVerificaExclusividadeIdentificadorAcomodacao :: getResultado() throw (EErroPersistencia){
+	bool resultado;
+
+	if(listaResultado.empty()){
+		resultado = false;
+	}
+	else{
+		resultado = true;
+	}
+
+	return resultado;
+}
+
+//---------------------------------------------------------------------------
+// Classe ComandoVerificaAcomodacaoPertenceUsuario
+
+ComandoVerificaAcomodacaoPertenceUsuario :: ComandoVerificaAcomodacaoPertenceUsuario (Identificador id, Identificador idAcomodacao){
+	containerAcomodacao += "SELECT Identificador FROM Acomodacoes WHERE Identificador = ";
+	containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
+	containerAcomodacao += " AND IdentificadorUsuario = ";
+	containerAcomodacao += '\'' + id.getIdentificador() + '\'';
+}
+
+bool ComandoVerificaAcomodacaoPertenceUsuario :: getResultado() throw (EErroPersistencia){
+	bool resultado;
+
+	if(listaResultado.empty()){
+		resultado = false;
+	}
+	else{
+		resultado = true;
+	}
+
+	return resultado;
+}
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarDisponibilidade
+
+ComandoCadastrarDisponibilidade :: ComandoCadastrarDisponibilidade (Identificador idAcomodacao, Disponibilidade disponibilidade){
+	containerDisponibilidade += "INSERT INTO Disponibilidades VALUES (";
+	containerDisponibilidade += '\'' + idAcomodacao.getIdentificador() + "', ";
+	containerDisponibilidade += '\'' + disponibilidade.getDataInicioDisponibilidade().getData() + "', ";
+	containerDisponibilidade += '\'' + disponibilidade.getDataTerminoDisponibilidade().getData() + "')";
+}
+
+//---------------------------------------------------------------------------
+// Classe ComandoVerificaAcomodacaoPossuiDisponibilidade
+
+ComandoVerificaAcomodacaoPossuiDisponibilidade :: ComandoVerificaAcomodacaoPossuiDisponibilidade (Identificador idAcomodacao){
+	containerDisponibilidade += "SELECT IdentificadorAcomodacao FROM Disponibilidades WHERE IdentificadorAcomodacao = ";
+	containerDisponibilidade += '\'' + idAcomodacao.getIdentificador() + '\'';
+}
+
+bool ComandoVerificaAcomodacaoPossuiDisponibilidade :: getResultado() throw (EErroPersistencia){
+	bool resultado;
+
+	if(listaResultado.empty()){
+			resultado = false;
+		}
+	else{
+			resultado = true;
+		}
+
+	return resultado;
 }
 
 //---------------------------------------------------------------------------
@@ -339,8 +509,8 @@ ComandoCadastrarAcomodacao :: ComandoCadastrarAcomodacao(Identificador identific
 
 int CntrServAutenticacao :: autenticar(Identificador *id, Senha *senha){
 	int resultado;
-	// ContainerUsuario* container = new ContainerUsuario();
 	string senha_recuperada;
+
 	ComandoLerSenha comandoLerSenha(id);
 
 	try{
@@ -517,11 +687,12 @@ int CntrServUsuario :: descadastrarCartaoDeCredito(Identificador* id){
 }
 
 
-int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade){
+int CntrServAcomodacao :: cadastrar(Identificador *id, Identificador *idAcomodacao, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade){
 	int resultado;
 	Acomodacao acomodacao;
 	ContaCorrente contaCorrente_recuperada;
 
+	acomodacao.setIdentificadorAcomodacao(*idAcomodacao);
 	acomodacao.setTipoAcomodacao(*tipo);
 	acomodacao.setCapacidadeAcomodacao(*capacidade);
 	acomodacao.setDiariaAcomodacao(*preco);
@@ -539,6 +710,21 @@ int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, C
 		return FALHA;
 	}
 	
+	// Verifica se a id da acomodacao ja foi utilizada
+	ComandoVerificaExclusividadeIdentificadorAcomodacao comandoVerificaIdentificador (*idAcomodacao);
+
+	try{
+		comandoVerificaIdentificador.executar();
+		resultado = comandoVerificaIdentificador.getResultado();
+		if (resultado == true){ // true: identificador ja utilizado
+			return ID_ACOMODACAO_JA_UTILIZADO;
+		}
+	}
+	catch (EErroPersistencia){
+		cout << "Erro" << endl;
+		return FALHA;
+	}
+
 	// Se recuperou alguma conta corrente, então pode cadastrar acomodação
 	if(contaCorrente_recuperada.getNumeroContaCorrente().getNumeroDeContaCorrente().size() != 0 &&
 	   contaCorrente_recuperada.getAgenciaContaCorrente().getAgencia().size() != 0 &&
@@ -577,8 +763,54 @@ int CntrServAcomodacao :: cancelar(Identificador *id, TipoDeAcomodacao *tipo, Da
 
 }
 
-int CntrServAcomodacao :: cadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){
+	int resultado;
+	Disponibilidade disponibilidade;
+
+	disponibilidade.setDataInicioDisponibilidade(*dataInicio);
+	disponibilidade.setDataTerminoDisponibilidade(*dataTermino);
+
+	// Verifica se a acomodacao realmente pertence ao usuário
+	ComandoVerificaAcomodacaoPertenceUsuario comandoVerificaPropriedadeDaAcomodacao (*id, *idAcomodacao);
+
+	try{
+		comandoVerificaPropriedadeDaAcomodacao.executar();
+		resultado = comandoVerificaPropriedadeDaAcomodacao.getResultado();
+		if(resultado == false){ //false: usuario nao e dono da acomodacao
+			return ACOMODACAO_NAO_PERTECE_USUARIO;
+		}
+	}
+	catch (ElementoResultado){
+		resultado = FALHA;
+	}
+
+	// Verifica se a acomodação já tem uma disponibilidade
+	ComandoVerificaAcomodacaoPossuiDisponibilidade comandoAcomodacaoPossuiDisponibilidade (*idAcomodacao);
+	
+	try{
+		comandoAcomodacaoPossuiDisponibilidade.executar();
+		resultado = comandoAcomodacaoPossuiDisponibilidade.getResultado();
+		if(resultado == true){ //false: usuario nao e dono da acomodacao
+			return ACOMODACAO_JA_TEM_DISPONIBILIDADE;
+		}
+	}
+	catch (ElementoResultado){
+		resultado = FALHA;
+	}
+
+	// Cadastra a disponibilidade
+	ComandoCadastrarDisponibilidade comando (*idAcomodacao, disponibilidade);
+
+	try{
+		comando.executar();
+		resultado = SUCESSO;
+	}
+	catch (ElementoResultado){
+		resultado = FALHA;
+	}
+	
+	return resultado;
 }
 
-int CntrServAcomodacao :: descadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: descadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){
 }

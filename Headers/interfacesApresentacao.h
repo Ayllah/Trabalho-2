@@ -52,8 +52,8 @@ public:
 	virtual int descadastrar(Identificador *id) throw(runtime_error) = 0;
 	virtual int reservar(Identificador *id) throw(runtime_error) = 0;
 	virtual int cancelar(Identificador *id) throw(runtime_error) = 0;
-	virtual int cadastrarDisp() throw(runtime_error) = 0;
-	virtual int descadastrarDisp() throw(runtime_error) = 0;
+	virtual int cadastrarDisp(Identificador *id) throw(runtime_error) = 0;
+	virtual int descadastrarDisp(Identificador *id) throw(runtime_error) = 0;
 
 	//Método por meio do qual é estabelecida ligação (link) com a controladora de negócio
 
