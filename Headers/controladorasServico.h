@@ -161,6 +161,14 @@ class ComandoPesquisarCartaoDeCredito : public ContainerUsuario {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoDescadastrarCartaoDeCredito.
+
+class ComandoDescadastrarCartaoDeCredito : public ContainerUsuario {
+	public:
+		ComandoDescadastrarCartaoDeCredito(Identificador);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarAcomodacao
 
 class ComandoCadastrarAcomodacao : public ContainerAcomodacao {
