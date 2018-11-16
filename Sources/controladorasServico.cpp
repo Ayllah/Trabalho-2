@@ -261,6 +261,17 @@ ContaCorrente ComandoPesquisarContaCorrente :: getResultado() throw (EErroPersis
 }
 
 //---------------------------------------------------------------------------
+// Classe ComandoDescadastrarContaCorrente.
+
+ComandoDescadastrarContaCorrente :: ComandoDescadastrarContaCorrente(Identificador id){
+	containerUsuario = "UPDATE Usuarios ";
+	containerUsuario += "SET NumeroConta = null, ";
+	containerUsuario += "Agencia = null, ";
+	containerUsuario += "Banco = null WHERE Identificador = ";
+	containerUsuario += '\'' + id.getIdentificador() + '\'';
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarCartaoDeCredito.
 
 ComandoCadastrarCartaoDeCredito :: ComandoCadastrarCartaoDeCredito(Identificador id, CartaoDeCredito cartaoDeCredito){
@@ -428,7 +439,7 @@ int CntrServUsuario :: cadastrarContaCorrente(Identificador* identificador, Nume
 	   contaCorrente_recuperada.getAgenciaContaCorrente().getAgencia().size() == 0 &&
 	   contaCorrente_recuperada.getBancoContaCorrente().getBanco().size() == 0){
 
-		ComandoCadastrarContaCorrente comando(*identificador, contaCorrente);
+		ComandoCadastrarContaCorrente comando (*identificador, contaCorrente);
 		
 		try{
 			comando.executar();
@@ -447,7 +458,19 @@ int CntrServUsuario :: cadastrarContaCorrente(Identificador* identificador, Nume
 }
 
 int CntrServUsuario :: descadastrarContaCorrente(Identificador* id){
+	int resultado;
 
+	ComandoDescadastrarContaCorrente comando (*id);
+
+	try{
+		comando.executar();
+		resultado = SUCESSO;
+	}
+	catch (EErroPersistencia) {
+		resultado = FALHA;
+	}
+
+	return resultado;
 }
 
 int CntrServUsuario :: cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade){

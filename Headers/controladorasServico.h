@@ -135,6 +135,15 @@ class ComandoPesquisarContaCorrente : public ContainerUsuario {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoDescadastrarContaCorrente.
+
+class ComandoDescadastrarContaCorrente : public ContainerUsuario {
+	public:
+		ComandoDescadastrarContaCorrente(Identificador);
+};
+
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarCartaoDeCredito.
 
 class ComandoCadastrarCartaoDeCredito : public ContainerUsuario {
