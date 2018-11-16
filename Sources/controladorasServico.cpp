@@ -321,6 +321,16 @@ CartaoDeCredito ComandoPesquisarCartaoDeCredito :: getResultado() throw (EErroPe
 }
 
 //---------------------------------------------------------------------------
+// Classe ComandoDescadastrarCartaoDeCredito.
+
+ComandoDescadastrarCartaoDeCredito :: ComandoDescadastrarCartaoDeCredito(Identificador id){
+	containerUsuario = "UPDATE Usuarios ";
+	containerUsuario += "SET NumeroCartao = null, ";
+	containerUsuario += "ValidadeCartao = null WHERE Identificador = ";
+	containerUsuario += '\'' + id.getIdentificador() + '\'';
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarAcomodacao
 
 ComandoCadastrarAcomodacao :: ComandoCadastrarAcomodacao(Identificador identificador, Acomodacao acomodacao){
@@ -514,6 +524,19 @@ int CntrServUsuario :: cadastrarCartaoDeCredito(Identificador* id, NumeroDeCarta
 }
 
 int CntrServUsuario :: descadastrarCartaoDeCredito(Identificador* id){
+	int resultado;
+
+	ComandoDescadastrarCartaoDeCredito comando (*id);
+
+	try{
+		comando.executar();
+		resultado = SUCESSO;
+	}
+	catch (EErroPersistencia) {
+		resultado = FALHA;
+	}
+
+	return resultado;
 }
 
 
