@@ -33,18 +33,26 @@ private:
 	IAprAutenticacao *cntrAutenticacao;
 	IAprAcomodacao *cntrAcomodacao;
 
+	// Teclas de ação do menu Painel Principal
 	const static int CONTA = 1;
 	const static int PESQUISAR = 2;
 	const static int ACOMODACAO = 3;
 	const static int SAIR = 0;
 
+	// Teclas de ação do menu Minha Conta
 	const static int EDITAR = 1;
-	const static int CADASTRAR_CONTA_CORRENTE = 2;
-	const static int DESCADASTRAR_CONTA_CORRENTE = 3;
-	const static int CADASTRAR_CARTAO_CREDITO = 4;
-	const static int DESCADASTRAR_CARTAO_CREDITO = 5;
-	const static int DESCADASTRAR = 6;
+	const static int MENU_CONTA_CORRENTE = 2;
+	const static int MENU_CARTAO_DE_CREDITO = 3;
+	const static int DESCADASTRAR = 4;
 
+	// Teclas de ação do menu Conta Corrente
+	const static int CADASTRAR_CONTA_CORRENTE = 1;
+	const static int DESCADASTRAR_CONTA_CORRENTE = 3;
+
+	// Teclas de ação do menu Cartao de Credito
+	const static int CADASTRAR_CARTAO_CREDITO = 1;
+	const static int DESCADASTRAR_CARTAO_CREDITO = 3;
+	
 	const static int VOLTAR = 0;
 	const static int CONTINUAR = 1;
 	
@@ -58,7 +66,10 @@ private:
 	const static int FALHA = -1;
 	const static int DESISTENCIA = -2;
 
-	int painelConta(Identificador *id) throw(runtime_error);
+	int menuMinhaConta(Identificador *id) throw(runtime_error);
+	int menuContaCorrente(Identificador *id) throw(runtime_error);
+	int menuCartaoDeCredito(Identificador *id) throw(runtime_error);
+
 	//int editarUsuario(Identificador *id) throw(runtime_error);
 	int descadastrarUsuario(Identificador *id) throw(runtime_error);
 

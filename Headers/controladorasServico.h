@@ -41,7 +41,8 @@ public:
         }
 };
 
-//classe ContainerUsuario
+//---------------------------------------------------------------------------
+// Classe ContainerUsuario
 
 class ContainerUsuario {
 private:
@@ -63,6 +64,33 @@ public:
 	}
 	
 	void executar() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ContainerAcomodacao
+
+class ContainerAcomodacao {
+	private: 
+		const char *nomeBancoDados;
+		sqlite3 *bd;
+		char *mensagem;
+		int rc;
+		void conectar() throw (EErroPersistencia);
+		void desconectar() throw (EErroPersistencia);
+	    static int callback(void *, int, char **, char **);
+	
+	protected:
+		static list<ElementoResultado> listaResultado;
+        string containerAcomodacao;
+
+	public:
+		ContainerAcomodacao() {
+			//Informa o nome do banco de dados.
+				nomeBancoDados = "BaseDeDados";
+		}
+		
+		void executar() throw (EErroPersistencia);
+
 };
 
 //---------------------------------------------------------------------------
@@ -121,6 +149,14 @@ class ComandoPesquisarCartaoDeCredito : public ContainerUsuario {
 	public:
 		ComandoPesquisarCartaoDeCredito(Identificador);
 		CartaoDeCredito getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarAcomodacao
+
+class ComandoCadastrarAcomodacao : public ContainerAcomodacao {
+	public:
+		ComandoCadastrarAcomodacao(Identificador, Acomodacao);
 };
 
 //---------------------------------------------------------------------------

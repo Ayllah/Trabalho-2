@@ -194,7 +194,7 @@ public:
      *@param cidadeAcomodacao é o nome fornecido pelo usuário.
      */
 
-    void setNomeAcomodacao(Nome cidadeAcomodacao){
+    void setNomeCidadeAcomodacao(Nome cidadeAcomodacao){
         this->cidadeAcomodacao = cidadeAcomodacao;
     }
 
@@ -203,7 +203,7 @@ public:
      *@return Nome cidadeAcomodacao (objeto da classe).
      */
 
-    Nome getNomeAcomodacao() const {
+    Nome getNomeCidadeAcomodacao() const {
         return cidadeAcomodacao;
     }
 

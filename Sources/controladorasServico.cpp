@@ -3,36 +3,37 @@
 //Atributo estático container List.
 
 list<ElementoResultado> ContainerUsuario::listaResultado;
-
+list<ElementoResultado> ContainerAcomodacao::listaResultado;
 //classe EErroPersistencia
 
-EErroPersistencia::EErroPersistencia(string mensagem){
+EErroPersistencia :: EErroPersistencia(string mensagem){
         this->mensagem = mensagem;
 }
 
-string EErroPersistencia::what() {
+string EErroPersistencia :: what() {
         return mensagem;
 }
 
 //classe ElementoResultado
 
-void ElementoResultado::setNomeColuna(const string& nomeColuna) {
+void ElementoResultado :: setNomeColuna(const string& nomeColuna) {
         this->nomeColuna = nomeColuna;
 }
 
-void ElementoResultado::setValorColuna(const string& valorColuna){
+void ElementoResultado :: setValorColuna(const string& valorColuna){
         this->valorColuna = valorColuna;
 }
 
-//classe ContainerUsuario
+// ---------------------------------------------------------------------
+// Classe ContainerUsuario
 
-void ContainerUsuario::conectar() throw (EErroPersistencia) {
+void ContainerUsuario :: conectar() throw (EErroPersistencia) {
       rc = sqlite3_open(nomeBancoDados, &bd);
       if( rc != SQLITE_OK )
         throw EErroPersistencia("Erro na conexao ao banco de dados");
 }
 
-void ContainerUsuario::desconectar() throw (EErroPersistencia) {
+void ContainerUsuario :: desconectar() throw (EErroPersistencia) {
       rc =  sqlite3_close(bd);
       if( rc != SQLITE_OK )
         throw EErroPersistencia("Erro na desconexao ao banco de dados");      
@@ -70,6 +71,54 @@ int ContainerUsuario::callback(void *NotUsed, int argc, char **valorColuna, char
       return 0;
 }
 
+// ---------------------------------------------------------------------
+// Classe ContainerAcomodacao
+
+void ContainerAcomodacao :: conectar() throw (EErroPersistencia) {
+      rc = sqlite3_open(nomeBancoDados, &bd);
+      if( rc != SQLITE_OK )
+        throw EErroPersistencia("Erro na conexao ao banco de dados");
+}
+
+void ContainerAcomodacao :: desconectar() throw (EErroPersistencia) {
+      rc =  sqlite3_close(bd);
+      if( rc != SQLITE_OK )
+        throw EErroPersistencia("Erro na desconexao ao banco de dados");      
+}
+
+void ContainerAcomodacao :: executar() throw (EErroPersistencia) {
+        conectar();
+		cout << containerAcomodacao << endl;
+        rc = sqlite3_exec(bd, containerAcomodacao.c_str(), callback, 0, &mensagem);
+        cout << "Digite s para imprimir mensagem" << endl;
+		char c = getchar();
+		if (c == 's')
+			cout << mensagem << endl;
+
+        if(rc != SQLITE_OK){
+		        if (mensagem){
+                	free(mensagem);
+                }
+                throw EErroPersistencia("Erro na execucao do comando SQL");
+        } 
+        
+		desconectar();
+}
+
+int ContainerAcomodacao::callback(void *NotUsed, int argc, char **valorColuna, char **nomeColuna){
+      NotUsed = 0;
+      ElementoResultado elemento;
+      int i;
+      for(i = 0; i < argc; i++){
+        elemento.setNomeColuna(nomeColuna[i]);
+        elemento.setValorColuna(valorColuna[i] ? valorColuna[i]: "NULL");
+        listaResultado.push_front(elemento);
+      }
+      return 0;
+}
+
+// --------------------------------------------------------------
+// Classe ComandoLerSenha
 
 ComandoLerSenha :: ComandoLerSenha(Identificador *id) {
 	containerUsuario = "SELECT Senha FROM Usuarios WHERE Identificador = ";
@@ -154,17 +203,12 @@ Usuario ComandoPesquisarUsuario :: getResultado() throw (EErroPersistencia){
 // Classe ComandoCadastrarContaCorrente.
 
 ComandoCadastrarContaCorrente :: ComandoCadastrarContaCorrente (Identificador id, ContaCorrente contaCorrente){
-	cout << "Antes de set" << containerUsuario << endl;
-	cout << "Banco aqui: " << contaCorrente.getBancoContaCorrente().getBanco() << endl;
-	cout << "ID:" << id.getIdentificador() << endl;
-
 	containerUsuario = "UPDATE Usuarios ";
 	containerUsuario += "SET NumeroConta = '" + contaCorrente.getNumeroContaCorrente().getNumeroDeContaCorrente();
 	containerUsuario += "', Agencia = '" + contaCorrente.getAgenciaContaCorrente().getAgencia();
 	containerUsuario += "', Banco = '" + contaCorrente.getBancoContaCorrente().getBanco();
 	containerUsuario += "' WHERE Identificador = ";
 	containerUsuario += '\'' + id.getIdentificador() + '\'';
-	cout << "Apos set" << containerUsuario << endl;
 }
 
 //---------------------------------------------------------------------------
@@ -173,7 +217,7 @@ ComandoCadastrarContaCorrente :: ComandoCadastrarContaCorrente (Identificador id
 ComandoPesquisarContaCorrente :: ComandoPesquisarContaCorrente (Identificador id){
 	containerUsuario = "SELECT NumeroConta, Agencia, Banco FROM Usuarios WHERE Identificador = ";
 	containerUsuario += '\'' + id.getIdentificador() + '\'';
-	containerUsuario += " AND NumeroConta <> null";
+	containerUsuario += " AND NumeroConta <> 'null'";
 }
 
 ContaCorrente ComandoPesquisarContaCorrente :: getResultado() throw (EErroPersistencia) {
@@ -187,22 +231,14 @@ ContaCorrente ComandoPesquisarContaCorrente :: getResultado() throw (EErroPersis
 
 	//Remover Numero Conta Corrente
 	if(listaResultado.empty()){
+		cout << "lista vazia. Pesquisa nao retorna nada" << endl;
 		return contaCorrente;
 		throw EErroPersistencia("Lista de resultado vazia.");
 	}
 	resultado = listaResultado.back();
 	listaResultado.pop_back();
-
-	// if(resultado.getValorColuna().size() == 0){
-	// 	return contaCorrente;
-	// 	throw EErroPersistencia("Valor recuperado na lista de resultado fora do padrao.");
-	// }
-
-	// cout << "conta recuperada" << resultado.getValorColuna() << endl;
 	numeroDeContaCorrente.setNumeroDeContaCorrente(resultado.getValorColuna());
 	contaCorrente.setNumeroContaCorrente(numeroDeContaCorrente);
-
-	// cout << "parte 1" << endl;
 
 	//Remover Agencia
 	if(listaResultado.empty()){
@@ -211,12 +247,6 @@ ContaCorrente ComandoPesquisarContaCorrente :: getResultado() throw (EErroPersis
 	}
 	resultado = listaResultado.back();
 	listaResultado.pop_back();
-	
-	// if(resultado.getValorColuna().size() == 0){
-	// 	return contaCorrente;
-	// 	throw EErroPersistencia("Valor recuperado na lista de resultado fora do padrao.");
-	// }
-
 	agencia.setAgencia(resultado.getValorColuna());
 	contaCorrente.setAgenciaContaCorrente(agencia);	
 
@@ -252,7 +282,7 @@ ComandoCadastrarCartaoDeCredito :: ComandoCadastrarCartaoDeCredito(Identificador
 ComandoPesquisarCartaoDeCredito :: ComandoPesquisarCartaoDeCredito (Identificador id){
 	containerUsuario = "SELECT NumeroCartao, ValidadeCartao FROM Usuarios WHERE Identificador = ";
 	containerUsuario += '\'' + id.getIdentificador() + '\'';
-	containerUsuario += " AND NumeroCartao <> null";
+	containerUsuario += " AND NumeroCartao <> 'null'";
 }
 
 CartaoDeCredito ComandoPesquisarCartaoDeCredito :: getResultado() throw (EErroPersistencia){
@@ -283,6 +313,20 @@ CartaoDeCredito ComandoPesquisarCartaoDeCredito :: getResultado() throw (EErroPe
 
 	return cartaoDeCredito;
 }
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarAcomodacao
+
+ComandoCadastrarAcomodacao :: ComandoCadastrarAcomodacao(Identificador identificador, Acomodacao acomodacao){
+	containerAcomodacao = "INSERT INTO Acomodacoes VALUES (";
+	containerAcomodacao += "'" + identificador.getIdentificador() + "', ";
+	containerAcomodacao += "'" + acomodacao.getTipoAcomodacao().getTipoDeAcomodacao() + "', ";
+	containerAcomodacao += "'" + to_string(acomodacao.getCapacidadeAcomodacao().getCapacidade()) + "', ";
+	containerAcomodacao += "'" + acomodacao.getNomeCidadeAcomodacao().getNome() + "', ";
+	containerAcomodacao += "'" + acomodacao.getEstadoAcomodacao().getEstado() + "', ";
+	containerAcomodacao += "'" + to_string(acomodacao.getDiariaAcomodacao().getDiaria()) + "', null, null, null, null)";
+}
+
 //---------------------------------------------------------------------------
 //Classe Controle Servico Autenticacao.
 
@@ -387,7 +431,7 @@ int CntrServUsuario :: cadastrarContaCorrente(Identificador* identificador, Nume
 	if(contaCorrente_recuperada.getNumeroContaCorrente().getNumeroDeContaCorrente().size() == 0 &&
 	   contaCorrente_recuperada.getAgenciaContaCorrente().getAgencia().size() == 0 &&
 	   contaCorrente_recuperada.getBancoContaCorrente().getBanco().size() == 0){
-		
+
 		ComandoCadastrarContaCorrente comando(*identificador, contaCorrente);
 		
 		try{
@@ -454,7 +498,25 @@ int CntrServUsuario :: descadastrarCartaoDeCredito(Identificador* id){
 
 
 int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade){
+	Acomodacao acomodacao;
 
+	acomodacao.setTipoAcomodacao(*tipo);
+	acomodacao.setCapacidadeAcomodacao(*capacidade);
+	acomodacao.setDiariaAcomodacao(*preco);
+	acomodacao.setEstadoAcomodacao(*estado);
+	acomodacao.setNomeCidadeAcomodacao(*cidade);
+
+	ComandoCadastrarAcomodacao comando (*id, acomodacao);
+	
+	try{
+		comando.executar();
+	}
+	catch (EErroPersistencia){
+		cout << "Erro no cadastro" << endl;
+		return FALHA;
+	}
+   	
+	return SUCESSO;	
 }
 
 int CntrServAcomodacao :: consultar(Identificador *id, Data *dataInicio, Data *dataTermino){
