@@ -227,11 +227,8 @@ ContaCorrente ComandoPesquisarContaCorrente :: getResultado() throw (EErroPersis
 	Banco banco;
 	ContaCorrente contaCorrente;
 
-	cout << "parte 0" << endl;
-
 	//Remover Numero Conta Corrente
 	if(listaResultado.empty()){
-		cout << "lista vazia. Pesquisa nao retorna nada" << endl;
 		return contaCorrente;
 		throw EErroPersistencia("Lista de resultado vazia.");
 	}
@@ -249,8 +246,6 @@ ContaCorrente ComandoPesquisarContaCorrente :: getResultado() throw (EErroPersis
 	listaResultado.pop_back();
 	agencia.setAgencia(resultado.getValorColuna());
 	contaCorrente.setAgenciaContaCorrente(agencia);	
-
-	cout << "parte 2" << endl;
 
 	//Remover Banco
 	if(listaResultado.empty()){
@@ -319,6 +314,7 @@ CartaoDeCredito ComandoPesquisarCartaoDeCredito :: getResultado() throw (EErroPe
 
 ComandoCadastrarAcomodacao :: ComandoCadastrarAcomodacao(Identificador identificador, Acomodacao acomodacao){
 	containerAcomodacao = "INSERT INTO Acomodacoes VALUES (";
+	// IDENTIFICADOR_acoMODACAO
 	containerAcomodacao += "'" + identificador.getIdentificador() + "', ";
 	containerAcomodacao += "'" + acomodacao.getTipoAcomodacao().getTipoDeAcomodacao() + "', ";
 	containerAcomodacao += "'" + to_string(acomodacao.getCapacidadeAcomodacao().getCapacidade()) + "', ";
@@ -451,6 +447,7 @@ int CntrServUsuario :: cadastrarContaCorrente(Identificador* identificador, Nume
 }
 
 int CntrServUsuario :: descadastrarContaCorrente(Identificador* id){
+
 }
 
 int CntrServUsuario :: cadastrarCartaoDeCredito(Identificador* id, NumeroDeCartaoDeCredito* cartao, DataDeValidade* dataDeValidade){
@@ -498,7 +495,9 @@ int CntrServUsuario :: descadastrarCartaoDeCredito(Identificador* id){
 
 
 int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade){
+	int resultado;
 	Acomodacao acomodacao;
+	ContaCorrente contaCorrente_recuperada;
 
 	acomodacao.setTipoAcomodacao(*tipo);
 	acomodacao.setCapacidadeAcomodacao(*capacidade);
@@ -506,17 +505,38 @@ int CntrServAcomodacao :: cadastrar(Identificador *id, TipoDeAcomodacao *tipo, C
 	acomodacao.setEstadoAcomodacao(*estado);
 	acomodacao.setNomeCidadeAcomodacao(*cidade);
 
-	ComandoCadastrarAcomodacao comando (*id, acomodacao);
-	
+	// Verifica se existe uma conta corrente associada ao usuário
+	ComandoPesquisarContaCorrente comandoPesquisar(*id);
 	try{
-		comando.executar();
+		comandoPesquisar.executar();
+		contaCorrente_recuperada = comandoPesquisar.getResultado();
 	}
 	catch (EErroPersistencia){
-		cout << "Erro no cadastro" << endl;
+		cout << "Erro" << endl;
 		return FALHA;
 	}
-   	
-	return SUCESSO;	
+	
+	// Se recuperou alguma conta corrente, então pode cadastrar acomodação
+	if(contaCorrente_recuperada.getNumeroContaCorrente().getNumeroDeContaCorrente().size() != 0 &&
+	   contaCorrente_recuperada.getAgenciaContaCorrente().getAgencia().size() != 0 &&
+	   contaCorrente_recuperada.getBancoContaCorrente().getBanco(). size() != 0){
+
+		ComandoCadastrarAcomodacao comando (*id, acomodacao);
+	
+		try{
+			comando.executar();
+			resultado = SUCESSO;
+		}
+		catch (EErroPersistencia){
+			cout << "Erro no cadastro" << endl;
+			resultado = FALHA;
+		}
+	}
+	else{
+		resultado = CONTA_CORRENTE_AUSENTE;	
+	}
+	
+	return resultado;	
 }
 
 int CntrServAcomodacao :: consultar(Identificador *id, Data *dataInicio, Data *dataTermino){

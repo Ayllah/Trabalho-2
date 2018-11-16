@@ -101,6 +101,8 @@ private:
     const static int DESCADASTRAR_DISPONIBILIDADE = 6;
     const static int RETORNAR = 0;
 
+	const static int CONTA_CORRENTE_AUSENTE = 3;
+
 	IServAcomodacao *servidor;
 
     int cadastrar(Identificador *id) throw(runtime_error);

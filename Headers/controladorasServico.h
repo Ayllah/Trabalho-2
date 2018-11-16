@@ -194,6 +194,10 @@ public:
 };
 
 class CntrServAcomodacao : public IServAcomodacao {
+private:
+	
+	const static int CONTA_CORRENTE_AUSENTE = 3;
+
 public:
 
 	int cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);

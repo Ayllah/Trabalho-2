@@ -540,6 +540,10 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 					if(resultado == SUCESSO){
 						cout << "Acomodacao cadastrada com sucesso" << endl;
 					}
+					else if(resultado == CONTA_CORRENTE_AUSENTE){
+						cout << "Você nao tem uma conta corrente associada a sua conta." << endl;
+						cout << "Por favor, cadastre uma antes que você possa cadastrar suas acomodacoes." << endl;
+					}
 
 					break;
 
