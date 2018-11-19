@@ -461,10 +461,28 @@ bool ComandoVerificaExclusividadeIdentificadorAcomodacao :: getResultado() throw
 }
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisaIDAcomodacao
+ComandoPesquisaIDAcomodacao :: ComandoPesquisaIDAcomodacao (Identificador idAcomodacao){
+	containerAcomodacao = "SELECT Identificador FROM Acomodacoes WHERE Identificador = ";
+	containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
+}
+
+bool ComandoPesquisaIDAcomodacao :: getResultado() throw (EErroPersistencia){
+	bool resultado;
+
+	if(listaResultado.empty()){
+		return false;
+	}
+	else{
+		return true;
+	}
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoVerificaAcomodacaoPertenceUsuario
 
 ComandoVerificaAcomodacaoPertenceUsuario :: ComandoVerificaAcomodacaoPertenceUsuario (Identificador id, Identificador idAcomodacao){
-	containerAcomodacao += "SELECT Identificador FROM Acomodacoes WHERE Identificador = ";
+	containerAcomodacao = "SELECT Identificador FROM Acomodacoes WHERE Identificador = ";
 	containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
 	containerAcomodacao += " AND IdentificadorUsuario = ";
 	containerAcomodacao += '\'' + id.getIdentificador() + '\'';
@@ -494,24 +512,51 @@ ComandoCadastrarDisponibilidade :: ComandoCadastrarDisponibilidade (Identificado
 }
 
 //---------------------------------------------------------------------------
-// Classe ComandoVerificaAcomodacaoPossuiDisponibilidade
+// Classe ComandoPesquisarDisponibilidade
 
-ComandoVerificaAcomodacaoPossuiDisponibilidade :: ComandoVerificaAcomodacaoPossuiDisponibilidade (Identificador idAcomodacao){
-	containerDisponibilidade += "SELECT IdentificadorAcomodacao FROM Disponibilidades WHERE IdentificadorAcomodacao = ";
+ComandoPesquisarDisponibilidade :: ComandoPesquisarDisponibilidade (Identificador idAcomodacao){
+	containerDisponibilidade += "SELECT DataInicio, DataTermino FROM Disponibilidades WHERE IdentificadorAcomodacao = ";
 	containerDisponibilidade += '\'' + idAcomodacao.getIdentificador() + '\'';
 }
 
-bool ComandoVerificaAcomodacaoPossuiDisponibilidade :: getResultado() throw (EErroPersistencia){
-	bool resultado;
+list<Disponibilidade> ComandoPesquisarDisponibilidade :: getResultado() throw (EErroPersistencia){
+	list<Disponibilidade> listaDisponibilidade;
+	ElementoResultado resultado;
+	Data dataInicio_recuperada;
+	Data dataTermino_recuperada;
+	Disponibilidade disponibilidade_recuperada;
 
-	if(listaResultado.empty()){
-			resultado = false;
-		}
-	else{
-			resultado = true;
-		}
+	while(!listaResultado.empty()){
+		// Remove DataInicio
+		if (listaResultado.empty()){
+ 	       throw EErroPersistencia("Lista de resultados vazia.");
+   		}
+		resultado = listaResultado.back();
+		listaResultado.pop_back();
+		dataInicio_recuperada.setData(resultado.getValorColuna());
+		disponibilidade_recuperada.setDataInicioDisponibilidade(dataInicio_recuperada);
+		cout << "Data inicio: " << dataInicio_recuperada.getData() << endl;
+		
+		// Remove DataTermino
+		if (listaResultado.empty()){
+     	   throw EErroPersistencia("Lista de resultados vazia.");
+    	}
+		resultado = listaResultado.back();
+		listaResultado.pop_back();
+		dataTermino_recuperada.setData(resultado.getValorColuna());
+		disponibilidade_recuperada.setDataTerminoDisponibilidade(dataTermino_recuperada);
+		cout << "Data termino: " << dataTermino_recuperada.getData() << endl;
 
-	return resultado;
+		// Insere na lista de disponibilidades
+		
+		listaDisponibilidade.push_back( disponibilidade_recuperada );
+	}
+
+	// Data :: comparaDatas(*dataInicio, *dataTermino);
+	// Ordena a lista de disponibilidade
+	// listaDisponibilidade.sort(Disponibilidade :: comparaDisponibilidade);
+
+	return listaDisponibilidade;
 }
 
 //---------------------------------------------------------------------------
@@ -778,16 +823,156 @@ int CntrServAcomodacao :: consultar(Identificador *id, Data *dataInicio, Data *d
 int CntrServAcomodacao :: descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade){
 }
 
-int CntrServAcomodacao :: reservar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: reservar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){
+	int resultado;
+	list<Disponibilidade> listaDisponibilidade;
+	list<Disponibilidade> ::iterator it;
+	Disponibilidade disp;
+	Reserva reserva;
+	Data dataAnteriorReserva;
+	Data dataPosteriorReserva;
+	Data inicioDisponibilidadeOriginal;
+	Data terminoDisponibilidadeOriginal;
 
+	// A ação de reservar pode quebrar um intervalo de dispobilidade em até 2 partes
+	Data inicioDisponibilidadeModificadaEsquerda;
+	Data terminoDisponibilidadeModificadaEsquerda;
+	Disponibilidade disponibilidadeModificadaEsquerda;
+
+	Data inicioDisponibilidadeModificadaDireita;
+	Data terminoDisponibilidadeModificadaDireita;
+	Disponibilidade disponibilidadeModificadaDireita;
+
+	// Seta o objeto Reserva
+	reserva.setDataInicioReserva(*dataInicio);
+	reserva.setDataTerminoReserva(*dataTermino);
+	
+	dataAnteriorReserva = dataInicio->getDataAnterior();
+	dataPosteriorReserva = dataTermino->getDataAnterior();
+	
+	ComandoPesquisaIDAcomodacao comandoPesquisaAcomodacao (*idAcomodacao);
+	try{
+		comandoPesquisaAcomodacao.executar();
+		resultado = comandoPesquisaAcomodacao.getResultado();
+		if(resultado == false){
+			return ACOMODACAO_INEXISTENTE;
+		}
+	}
+	catch (ElementoResultado){
+		resultado = FALHA;
+	}
+
+	ComandoPesquisarDisponibilidade comandoPesquisar (*idAcomodacao);
+
+	try{
+		comandoPesquisar.executar();
+		listaDisponibilidade = comandoPesquisar.getResultado();
+		if(listaDisponibilidade.empty()){
+			return ACOMODACAO_NAO_DISPONIVEL;
+		}
+		else{
+			for(it = listaDisponibilidade.begin(); it != listaDisponibilidade.end(); ++it){
+				disp = *it;
+				inicioDisponibilidadeOriginal = disp.getDataInicioDisponibilidade();
+				terminoDisponibilidadeOriginal = disp.getDataTerminoDisponibilidade();
+				
+				if(!(Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == -1) &&
+				     !(Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 1)){
+					cout << "Reserva dentro do intervalo:" << endl;
+					cout << disp.getDataInicioDisponibilidade().getData() << endl;
+					cout << disp.getDataTerminoDisponibilidade().getData() << endl;
+
+					// Caso: Reserva ocupa todo o intervalo de disponibilidade
+					if ((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 0) &&
+					    (Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 0)){
+						cout << "Reserva ocupar o intervalo fechado" << endl;
+						// Sem nova disponibilidade
+					}
+
+					// Caso: Reserva começa no extremo inicial do intervalo de disponibilidade
+					else if ((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 0) &&
+					         (Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == -1)){
+						cout << "Reserva no extremo inicial do intervalo" << endl;
+						
+						// Deve gerar uma nova disponibilidade que fica a direita, na linha temporal, do intervalo reservado
+						inicioDisponibilidadeModificadaDireita = dataTermino->getDataPosterior();
+						terminoDisponibilidadeModificadaDireita = terminoDisponibilidadeOriginal;
+
+						cout << "Novo intervalo:" << endl;
+						cout << inicioDisponibilidadeModificadaDireita.getData() << endl;
+						cout << terminoDisponibilidadeModificadaDireita.getData() << endl;
+						
+						disponibilidadeModificadaDireita.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaDireita );
+						disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaDireita );
+					}
+
+					// Caso: Reserva termina no extremo final do intervalo de disponibilidade
+					else if((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 1) &&
+					        (Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 0)){
+						cout << "Reverva no extremo final do intervalo" << endl;
+
+						// Deve gerar uma nova disponibilidade que fica a esquerda, na linha temporal, do intervalo reservado
+						inicioDisponibilidadeModificadaEsquerda = inicioDisponibilidadeOriginal;
+						terminoDisponibilidadeModificadaEsquerda = dataInicio->getDataAnterior();
+
+						cout << "Novo intervalo:" << endl;
+						cout << inicioDisponibilidadeModificadaEsquerda.getData() << endl;
+						cout << terminoDisponibilidadeModificadaEsquerda.getData() << endl;
+
+						disponibilidadeModificadaEsquerda.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaEsquerda );
+						disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaEsquerda );
+					}
+					else{
+						cout << "Reserva no interior do intervalo, exceto os extremos" << endl;
+
+						// Deve gerar duas novas disponibilidades, a esquerda e a direita, na linha temporal, do intervalo reservado
+						inicioDisponibilidadeModificadaEsquerda = inicioDisponibilidadeOriginal;
+						terminoDisponibilidadeModificadaEsquerda = dataInicio->getDataAnterior();
+
+						inicioDisponibilidadeModificadaDireita = dataTermino->getDataPosterior();
+						terminoDisponibilidadeModificadaDireita = terminoDisponibilidadeOriginal;
+
+						cout << "Novo intervalo (esquerdo)"	<< endl;
+						cout << inicioDisponibilidadeModificadaEsquerda.getData() << endl;
+						cout << terminoDisponibilidadeModificadaEsquerda.getData() << endl;
+
+						disponibilidadeModificadaEsquerda.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaEsquerda );
+						disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaEsquerda );
+
+						cout << "Novo intervalo (direito)"	<< endl;
+						cout << inicioDisponibilidadeModificadaDireita.getData() << endl;
+						cout << terminoDisponibilidadeModificadaDireita.getData() << endl;
+
+						disponibilidadeModificadaDireita.setDataInicioDisponibilidade( inicioDisponibilidadeModificadaDireita );
+						disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade( terminoDisponibilidadeModificadaDireita );
+					}
+				
+					resultado =  SUCESSO;	
+					break;
+				}
+			}
+
+			// Se chegar no final e o resultado não for sucesso, então a acomodacao nao esta disponivel no periodo desejado
+			if (resultado != SUCESSO){
+				resultado = ACOMODACAO_INDISPONIVEL_NO_PERIODO;
+			}
+		}
+	}
+	catch (ElementoResultado){
+		cout << "Erro aqui" << endl;
+		resultado = FALHA;
+	}
+
+	return resultado;
 }
 
-int CntrServAcomodacao :: cancelar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino){
+int CntrServAcomodacao :: cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){
 
 }
 
 int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){
 	int resultado;
+	list<Disponibilidade> listaDisponibilidade;
 	Disponibilidade disponibilidade;
 
 	disponibilidade.setDataInicioDisponibilidade(*dataInicio);
@@ -801,20 +986,6 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 		resultado = comandoVerificaPropriedadeDaAcomodacao.getResultado();
 		if(resultado == false){ //false: usuario nao e dono da acomodacao
 			return ACOMODACAO_NAO_PERTECE_USUARIO;
-		}
-	}
-	catch (ElementoResultado){
-		resultado = FALHA;
-	}
-
-	// Verifica se a acomodação já tem uma disponibilidade
-	ComandoVerificaAcomodacaoPossuiDisponibilidade comandoAcomodacaoPossuiDisponibilidade (*idAcomodacao);
-	
-	try{
-		comandoAcomodacaoPossuiDisponibilidade.executar();
-		resultado = comandoAcomodacaoPossuiDisponibilidade.getResultado();
-		if(resultado == true){ //false: usuario nao e dono da acomodacao
-			return ACOMODACAO_JA_TEM_DISPONIBILIDADE;
 		}
 	}
 	catch (ElementoResultado){

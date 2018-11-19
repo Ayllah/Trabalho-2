@@ -101,6 +101,9 @@ private:
     const static int DESCADASTRAR_DISPONIBILIDADE = 6;
     const static int RETORNAR = 0;
 
+	const static int ACOMODACAO_INDISPONIVEL_NO_PERIODO = 9;
+	const static int ACOMODACAO_INEXISTENTE = 8;
+	const static int ACOMODACAO_NAO_DISPONIVEL = 7;
 	const static int ACOMODACAO_JA_TEM_DISPONIBILIDADE = 6;
 	const static int ACOMODACAO_NAO_PERTECE_USUARIO = 5;
 	const static int ID_ACOMODACAO_JA_UTILIZADO = 4;

@@ -445,6 +445,7 @@ public:
         return dataTerminoDisponibilidade;
     }
 
+    bool comparaDisponibilidade(Disponibilidade, Disponibilidade) const;
 };
 
 #endif // ENTIDADES_H_INCLUDED

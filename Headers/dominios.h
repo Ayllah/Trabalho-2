@@ -214,7 +214,7 @@ private:
 
 	const static int DIA_MINIMO = 1;
 	const static int DIA_MAXIMO = 31;
-	const static int NUMERO_MESES = 12;
+	const static int QUANTIDADE_MESES = 12;
 	const static int ANO_MINIMO = 2000;
 	const static int ANO_MAXIMO = 2099;
 	const static int FEVEREIRO_NAO_BISSEXTO = 28;
@@ -222,13 +222,21 @@ private:
 	const static int VALIDO = 1;
 	const static int INVALIDO = 0;
 
+	string meses[QUANTIDADE_MESES] = {"jan", "fev", "mar", "abr",
+                                  "mai", "jun", "jul", "ago",
+                                  "set", "out", "nov", "dez"};
+    int numeroDiasDoMes[QUANTIDADE_MESES] = {31, 29, 31, 30,
+                                         31, 30, 31, 31,
+                                         30, 31, 30, 31};
+
+
 	//Métodos auxiliares de validação
 
 	/**
 	 *@brief Método responsável por verificar se o mês fornecido está de acordo com os padrões definidos.
 	 */
 
-	int verificaMes(string, string * );
+	int verificaMes(string);
 
 	/**
 	 *@brief Método responsável por verificar se o ano fornecido é ou não bissexto.
@@ -245,6 +253,14 @@ private:
      */
 
 	void validar(string) throw (invalid_argument);
+
+	//Métodos auxiliares para verificar posição relativa de uma data no calendário
+
+	bool diaComecoMes() throw (invalid_argument);
+	bool diaMeioMes() throw (invalid_argument);
+	bool diaFimMes() throw (invalid_argument);
+	bool diaComecoAno() throw (invalid_argument);
+	bool diaFimAno() throw (invalid_argument);
 
 public:
 
@@ -265,6 +281,30 @@ public:
     string getData() const {
         return data;
     }
+
+	/**
+	 *@brief Retorna a data do dia anterior.
+	 *@return Data dataAnterior.
+	 */
+
+	Data getDataAnterior() throw (invalid_argument);
+
+	/**
+	 *@brief Retorna a data do dia posterior.
+	 *@return Data dataPosterior.
+	 */
+
+	Data getDataPosterior() throw (invalid_argument);
+
+	/**
+	 *@brief Retorna um inteiro indicando o tipo de relação comparativa entre a primeira e a segunda Data.
+	 *-1: menor que
+	 *0: igual
+	 *1: maior que
+	 *@return int resultadoComparacao.
+	 */
+
+	static int comparaDatas(Data, Data); 
 
 };
 

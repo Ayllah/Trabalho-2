@@ -240,6 +240,15 @@ class ComandoVerificaExclusividadeIdentificadorAcomodacao : public ContainerAcom
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisaIDAcomodacao
+
+class ComandoPesquisaIDAcomodacao : public ContainerAcomodacao {
+	public:
+		ComandoPesquisaIDAcomodacao(Identificador);
+		bool getResultado() throw (EErroPersistencia);	
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoPesquisaAcomodacoesDoUsuario
 
 class ComandoPesquisaAcomodacoesDoUsuario : public ContainerAcomodacao {
@@ -266,12 +275,12 @@ class ComandoCadastrarDisponibilidade : public ContainerDisponibilidade {
 };
 
 //---------------------------------------------------------------------------
-// Classe ComandoVerificaAcomodacaoPossuiDisponibilidade
+// Classe ComandoPesquisarDisponibilidade
 
-class ComandoVerificaAcomodacaoPossuiDisponibilidade : public ContainerDisponibilidade {
+class ComandoPesquisarDisponibilidade : public ContainerDisponibilidade {
 	public:
-		ComandoVerificaAcomodacaoPossuiDisponibilidade (Identificador);
-		bool getResultado() throw (EErroPersistencia);
+		ComandoPesquisarDisponibilidade (Identificador);
+		list<Disponibilidade> getResultado() throw (EErroPersistencia);
 };
 
 //---------------------------------------------------------------------------
@@ -310,6 +319,9 @@ public:
 
 class CntrServAcomodacao : public IServAcomodacao {
 private:
+	const static int ACOMODACAO_INDISPONIVEL_NO_PERIODO = 9;
+	const static int ACOMODACAO_INEXISTENTE = 8;
+	const static int ACOMODACAO_NAO_DISPONIVEL = 7;
 	const static int ACOMODACAO_JA_TEM_DISPONIBILIDADE = 6;
 	const static int ACOMODACAO_NAO_PERTECE_USUARIO = 5;
 	const static int ID_ACOMODACAO_JA_UTILIZADO = 4;
@@ -320,8 +332,8 @@ public:
 	int cadastrar(Identificador *id, Identificador *idAcomodacao, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
 	int consultar(Identificador *id, Data *dataInicio, Data *dataTermino);
 	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
-	int reservar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
-	int cancelar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
+	int reservar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
+	int cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
 	int cadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
 	int descadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
 

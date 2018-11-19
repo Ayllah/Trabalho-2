@@ -14,10 +14,10 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 		cout << endl << "Autenticacao de Usuario." << endl << endl;
 
 	try{
-		cout << "Digite seu ID: " << endl; //pedro
+		cout << "Digite seu ID: " << endl;
 		getline(cin, entrada);
 		id->setIdentificador(entrada);
-		cout << "Digite sua senha: " << endl; //1a3A567$
+		cout << "Digite sua senha: " << endl;
 		getline(cin, entrada);
 		senha->setSenha(entrada);
 
@@ -558,6 +558,21 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 
 				case RESERVAR_ACOMODACAO:           
 					resultado = reservar(id);
+					if (resultado == SUCESSO){
+						cout << "Reserva realizada com sucesso!" << endl;
+					}
+					else if (resultado == ACOMODACAO_INEXISTENTE) {
+						cout << "Nao encontramos nenhum acomodacao com esse identificador" << endl;
+					}
+					else if (resultado == ACOMODACAO_NAO_DISPONIVEL){
+						cout << "Esta acomodacao esta indisponivel no momento." << endl;
+					}
+					else if (resultado == ACOMODACAO_INDISPONIVEL_NO_PERIODO){
+						cout << "Esta acomodacao nao esta disponivel no periodo desejado. Por favor, tente outro perido." << endl;
+					}
+					else if (resultado == FALHA){
+						cout << "Erro no cadastro da reserva. Por favor, tente novamente mais tarde." << endl;
+					}
 					
 					break;
 
@@ -706,7 +721,7 @@ int CntrAprAcomodacao :: descadastrar(Identificador *id) throw(runtime_error){
 int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
     Data *dataInicio = new Data();
     Data *dataTermino = new Data();
-    TipoDeAcomodacao *tipo = new TipoDeAcomodacao();
+    Identificador *idAcomodacao = new Identificador();
 
     // OBS: Para reservar e preciso ter cartao de credito
 
@@ -716,12 +731,9 @@ int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
 	cout << endl << "Reserva de Acomodacao." << endl << endl;
 
 	try{
-		cout << "Digite seu ID: " << endl; //pedro
+		cout << "Digite o identificador da acomodacao que voce deseja reservar: " << endl; 
 		getline(cin, entrada);
-		id->setIdentificador(entrada);
-		cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-		getline(cin, entrada);
-		tipo->setTipoDeAcomodacao(entrada);
+		idAcomodacao->setIdentificador(entrada);
 		cout << "Digite a data de inicio da reserva (DD/MMM/AAAA): " << endl;
 		getline(cin, entrada);
 		dataInicio->setData(entrada);
@@ -729,7 +741,7 @@ int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
 		getline(cin, entrada);
 		dataTermino->setData(entrada);
 
-		resultado = servidor->reservar(id, tipo, dataInicio, dataTermino);
+		resultado = servidor->reservar(id, idAcomodacao, dataInicio, dataTermino);
 	}
 	catch (const invalid_argument &exp) {
 		cout << endl << "Formato invalido! Tente novamente." << endl;
@@ -738,7 +750,7 @@ int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
 
     delete dataInicio;
     delete dataTermino;
-    delete tipo;
+    delete idAcomodacao;
 
     return resultado;
 
@@ -747,7 +759,7 @@ int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
 int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
     Data *dataInicio = new Data();
     Data *dataTermino = new Data();
-    TipoDeAcomodacao *tipo = new TipoDeAcomodacao();
+    Identificador *idAcomodacao = new Identificador();
 
     // OBS: Uma reserva pode ser cancelada, desde que a data de cancelamento anteceda o período da reserva.
 
@@ -760,9 +772,6 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 		cout << "Digite seu ID: " << endl; //pedro
 		getline(cin, entrada);
 		id->setIdentificador(entrada);
-		cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-		getline(cin, entrada);
-		tipo->setTipoDeAcomodacao(entrada);
 		cout << "Digite a data de inicio da reserva (DD/MMM/AAAA): " << endl;
 		getline(cin, entrada);
 		dataInicio->setData(entrada);
@@ -770,7 +779,7 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 		getline(cin, entrada);
 		dataTermino->setData(entrada);
     	
-		resultado = servidor->cancelar(id, tipo, dataInicio, dataTermino);
+		resultado = servidor->cancelar(id, idAcomodacao, dataInicio, dataTermino);
 	}
 	catch (const invalid_argument &exp) {
 		cout << endl << "Formato invalido! Tente novamente." << endl;
@@ -780,7 +789,7 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 
     delete dataInicio;
     delete dataTermino;
-    delete tipo;
+    delete idAcomodacao;
     
     return resultado;
 }
