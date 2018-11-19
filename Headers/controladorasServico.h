@@ -284,6 +284,22 @@ class ComandoPesquisarDisponibilidade : public ContainerDisponibilidade {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoDescadastrarDisponibilidade
+
+class ComandoDescadastrarDisponibilidade : public ContainerDisponibilidade {
+	public:
+		ComandoDescadastrarDisponibilidade (Identificador, Disponibilidade);		
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarReserva
+
+class ComandoCadastrarReserva : public ContainerReserva {
+	public:
+		ComandoCadastrarReserva (Identificador id, Identificador idAcomodacao, Reserva);
+};
+
+//---------------------------------------------------------------------------
 // Classe Controladora Autenticacao
 
 class CntrServAutenticacao : public IServAutenticacao {
