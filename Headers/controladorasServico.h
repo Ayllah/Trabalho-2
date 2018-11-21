@@ -274,6 +274,13 @@ class ComandoPesquisaAcomodacoesDoUsuario : public ContainerAcomodacao {
 };
 
 //---------------------------------------------------------------------------
+class ComandoProcuraAcomodacao : public ContainerAcomodacao{
+	public:
+		ComandoProcuraAcomodacao(Identificador);
+		list<Acomodacao> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoVerificaAcomodacaoPertenceUsuario
 
 class ComandoVerificaAcomodacaoPertenceUsuario : public ContainerAcomodacao {
@@ -351,7 +358,7 @@ public:
 
 class CntrServUsuario : public IServUsuario {
 private:
-
+	const static int ACOMODACAO_AINDA_CADASTRADA = 4;
 	const static int CARTAO_DE_CREDITO_JA_CADASTRADO = 3;
 	const static int CONTA_CORRENTE_JA_CADASTRADA = 2;
 	const static int USUARIO_JA_CADASTRADO = 1;

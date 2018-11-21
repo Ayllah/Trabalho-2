@@ -47,7 +47,6 @@ int CntrAprUsuario :: menuMinhaConta(Identificador *id) throw(runtime_error){
 	
 	cntrAutenticacao->setServidor(servidorAutenticacao);
 
-
 	while(true){
 		cout << endl << "-------------- Minha Conta ---------------" << endl;
 		//cout << EDITAR << " - Editar Perfil de Usuario" << endl;
@@ -106,6 +105,7 @@ int CntrAprUsuario :: menuMinhaConta(Identificador *id) throw(runtime_error){
 		}
 
 	}
+
 	delete cntrAutenticacao;
 	delete servidorAutenticacao;
 
@@ -149,6 +149,9 @@ int CntrAprUsuario :: menuContaCorrente(Identificador *id) throw(runtime_error){
 
 					if(resultado == SUCESSO){
 						cout << "Conta corrente REMOVIDA!" << endl;
+					}
+					else if (resultado == ACOMODACAO_AINDA_CADASTRADA){
+						cout << "Erro! Usuario possui acomodacao cadastrada." << endl;
 					}
 					else if (resultado == FALHA){
 						cout << "Erro ao tentar descadastrar conta corrente." << endl;
