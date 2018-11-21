@@ -21,15 +21,13 @@ int CntrAprAutenticacao :: autenticar(Identificador *id) throw(runtime_error) {
 		getline(cin, entrada);
 		senha->setSenha(entrada);
 
+		//Solicitar autenticacao
 		resultado = servidor->autenticar(id,senha);
 	}
 	catch (const invalid_argument &exp) {	
 		cout << endl << "Formato invalido! Tente novamente." << endl;
 		resultado = FALHA;
 	}
-
-
-	//Solicitar autenticacao
 	
 	delete senha;
 
@@ -456,7 +454,7 @@ int CntrAprUsuario :: executar (Identificador *id) throw (runtime_error){
 					break;
 
 				case PESQUISAR:
-					resultado = cntrAcomodacao->consultar(id);
+					resultado = cntrAcomodacao->consultar(id);					
 					break;
 				
 				case ACOMODACAO:
@@ -490,6 +488,9 @@ int CntrAprAcomodacao :: consultar(Identificador *id){
 	string entrada;
 	Data *dataInicio = new Data();
 	Data *dataTermino = new Data();
+	CapacidadeDeAcomodacao *capacidade = new CapacidadeDeAcomodacao();
+	Nome *nomeCidade = new Nome();
+	Estado *estado = new Estado();
 
 	try{
 		cout << endl << "Janela de Pesquisa de Acomodacoes" << endl << endl;
@@ -500,15 +501,31 @@ int CntrAprAcomodacao :: consultar(Identificador *id){
 		cout << "Digite a data final do intervalo de pesquisa: " << endl;
 		getline(cin, entrada);
 		dataTermino->setData(entrada);
+		cout << "Digite a capacidade mínima da acomodacao:" << endl;
+		getline(cin, entrada);
+		capacidade->setCapacidade(stoi(entrada));
+		cout << "Digite o nome da cidade na qual a acomodacao esta localizada:" << endl;
+		getline(cin, entrada);
+		nomeCidade->setNome(entrada);
+		cout << "Digite a sigla da UF da cidade na qual a acomodacao esta localizada:" << endl;
+		getline(cin, entrada);
+		estado->setEstado(entrada);
 	}
 	catch (const invalid_argument &exp) {
 		cout << endl << "Formato invalido! Tente novamente." << endl;
 	}
 
-	resultado = servidor->consultar(id, dataInicio, dataTermino);
+	resultado = servidor->consultar(id, dataInicio, dataTermino, capacidade, nomeCidade, estado);
 	
+	if(resultado == ACOMODACAO_NAO_ENCONTRADA){
+		cout << "Busca nao encontrou nenhuma acomodacao" << endl;
+	}
+
 	delete dataInicio;
 	delete dataTermino;
+	delete capacidade;
+	delete nomeCidade;
+	delete estado;
 
 	return resultado;
 }
@@ -564,6 +581,9 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 					else if (resultado == ACOMODACAO_INEXISTENTE) {
 						cout << "Nao encontramos nenhum acomodacao com esse identificador" << endl;
 					}
+					else if (resultado == ACOMODACAO_PERTECE_USUARIO){
+						cout << "Voce nao pode reservar sua propria acomodacao." << endl;
+					}
 					else if (resultado == ACOMODACAO_NAO_DISPONIVEL){
 						cout << "Esta acomodacao esta indisponivel no momento." << endl;
 					}
@@ -589,6 +609,9 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 					}
 					else if (resultado == ACOMODACAO_NAO_PERTECE_USUARIO){
 						cout << "Nao encontramos uma acomodacao, com esse identificador, cadastrada por voce." << endl;
+					}
+					else if(resultado == DISPONIBILIDADE_NAO_DISPONIVEL){
+						cout << "O periodo desejado ja esta reservado. Por favor, aguarde o fim da reserva." << endl;
 					}
 					else if (resultado == ACOMODACAO_JA_TEM_DISPONIBILIDADE){
 						cout << "Esta acomodacao ja tem uma disponibilidade" << endl;
@@ -769,9 +792,9 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 	cout << endl << "Cancelamento de Reserva." << endl << endl;
 
 	try{
-		cout << "Digite seu ID: " << endl; //pedro
+		cout << "Digite a ID da acomodacao que esta reserva e você deseja cancelar a reserva: " << endl; //pedro
 		getline(cin, entrada);
-		id->setIdentificador(entrada);
+		idAcomodacao->setIdentificador(entrada);
 		cout << "Digite a data de inicio da reserva (DD/MMM/AAAA): " << endl;
 		getline(cin, entrada);
 		dataInicio->setData(entrada);

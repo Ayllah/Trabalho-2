@@ -148,6 +148,13 @@ class ContainerReserva {
 };
 
 //---------------------------------------------------------------------------
+// Classe Ordenacao
+class Ordenacao {
+	public:
+		static bool comparacao(Disponibilidade, Disponibilidade);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoLerSenha.
 class ComandoLerSenha : public ContainerUsuario {
 	public:
@@ -249,6 +256,15 @@ class ComandoPesquisaIDAcomodacao : public ContainerAcomodacao {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisaAcomodacao
+
+class ComandoPesquisaAcomodacao : public ContainerAcomodacao{
+	public:
+		ComandoPesquisaAcomodacao(Identificador, Data, Data, CapacidadeDeAcomodacao, Nome, Estado);
+		list<Acomodacao> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoPesquisaAcomodacoesDoUsuario
 
 class ComandoPesquisaAcomodacoesDoUsuario : public ContainerAcomodacao {
@@ -292,11 +308,29 @@ class ComandoDescadastrarDisponibilidade : public ContainerDisponibilidade {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoDescadastrarTodasDisponibilidadesAcomodacao
+
+class ComandoDescadastrarTodasDisponibilidadesAcomodacao : public ContainerDisponibilidade {
+	public:
+		ComandoDescadastrarTodasDisponibilidadesAcomodacao (Identificador);
+};
+
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarReserva
 
 class ComandoCadastrarReserva : public ContainerReserva {
 	public:
 		ComandoCadastrarReserva (Identificador id, Identificador idAcomodacao, Reserva);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisaReserva
+
+class ComandoPesquisaReserva : public ContainerReserva {
+	public:
+		ComandoPesquisaReserva (Identificador);
+		list<Reserva> getResultado() throw (EErroPersistencia);
 };
 
 //---------------------------------------------------------------------------
@@ -310,6 +344,7 @@ private:
 public:
 	int autenticar(Identificador* id, Senha* senha);
 };
+
 
 //---------------------------------------------------------------------------
 // Classe Controladora Usuario
@@ -335,10 +370,13 @@ public:
 
 class CntrServAcomodacao : public IServAcomodacao {
 private:
-	const static int ACOMODACAO_INDISPONIVEL_NO_PERIODO = 9;
-	const static int ACOMODACAO_INEXISTENTE = 8;
-	const static int ACOMODACAO_NAO_DISPONIVEL = 7;
-	const static int ACOMODACAO_JA_TEM_DISPONIBILIDADE = 6;
+	const static int DISPONIBILIDADE_NAO_DISPONIVEL = 12;
+	const static int ACOMODACAO_NAO_ENCONTRADA = 11;
+	const static int ACOMODACAO_INDISPONIVEL_NO_PERIODO = 10;
+	const static int ACOMODACAO_INEXISTENTE = 9;
+	const static int ACOMODACAO_NAO_DISPONIVEL = 8;
+	const static int ACOMODACAO_JA_TEM_DISPONIBILIDADE = 7;
+	const static int ACOMODACAO_PERTECE_USUARIO = 6;
 	const static int ACOMODACAO_NAO_PERTECE_USUARIO = 5;
 	const static int ID_ACOMODACAO_JA_UTILIZADO = 4;
 	const static int CONTA_CORRENTE_AUSENTE = 3;
@@ -346,7 +384,7 @@ private:
 public:
 
 	int cadastrar(Identificador *id, Identificador *idAcomodacao, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
-	int consultar(Identificador *id, Data *dataInicio, Data *dataTermino);
+	int consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado);
 	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
 	int reservar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
 	int cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);

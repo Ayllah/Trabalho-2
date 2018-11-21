@@ -21,9 +21,11 @@ void CntrMIC :: entrar(){
     resultado = cntrAutenticar->autenticar(id);
 
     if(resultado == SUCESSO){
+        cout << "Autenticado com sucesso" << endl;
         cntrUsuario->executar(id);
     }
     else{
+        cout << "Falha na autenticao. Identificador ou senha incorreta. Por favor, tent novamente." << endl;
         return;
     }
 
