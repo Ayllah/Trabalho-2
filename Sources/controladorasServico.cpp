@@ -308,6 +308,14 @@ Usuario ComandoPesquisarUsuario :: getResultado() throw (EErroPersistencia){
 }
 
 //---------------------------------------------------------------------------
+// Classe ComandoRemoverUsuario
+
+ComandoRemoverUsuario :: ComandoRemoverUsuario (Identificador id){
+	containerUsuario = "DELETE FROM Usuarios WHERE Identificador = ";
+	containerUsuario += '\'' + id.getIdentificador() + '\'';
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarContaCorrente.
 
 ComandoCadastrarContaCorrente :: ComandoCadastrarContaCorrente (Identificador id, ContaCorrente contaCorrente){
@@ -498,32 +506,48 @@ bool ComandoPesquisaIDAcomodacao :: getResultado() throw (EErroPersistencia){
 }
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisaProprietarioAcomodacao
+ComandoPesquisaProprietarioAcomodacao :: ComandoPesquisaProprietarioAcomodacao(Identificador idAcomodacao){
+	containerAcomodacao = "SELECT IdentificadorUsuario FROM Acomodacoes WHERE Identificador = ";
+	containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
+}
+
+string ComandoPesquisaProprietarioAcomodacao :: getResultado() throw (EErroPersistencia){
+	ElementoResultado resultado;
+
+	if (listaResultado.empty()){
+		throw EErroPersistencia("Lista de resultados vazia.");
+	}
+	resultado = listaResultado.back();
+	listaResultado.pop_back();
+	
+	listaResultado.clear();
+	return resultado.getValorColuna();
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoPesquisaAcomodacao
 
 ComandoPesquisaAcomodacao :: ComandoPesquisaAcomodacao(Identificador id, Data dataInicio, Data dataTermino, CapacidadeDeAcomodacao capacidade, Nome cidade, Estado estado){
 	containerAcomodacao = "SELECT Identificador, Tipo, Capacidade, Diaria FROM Acomodacoes WHERE IdentificadorUsuario <> ";
 	containerAcomodacao += '\'' + id.getIdentificador() + '\'';
 	containerAcomodacao += " AND Capacidade >= ";
-	containerAcomodacao += '\'' + capacidade.getCapacidade() + '\'';
+	containerAcomodacao += '\'' + to_string(capacidade.getCapacidade()) + '\'';
 	containerAcomodacao += " AND Cidade = ";
 	containerAcomodacao += '\'' + cidade.getNome() + '\'';
 	containerAcomodacao += " AND Estado = ";
 	containerAcomodacao += '\'' + estado.getEstado() + '\'';
-	containerAcomodacao += " INNER JOIN Disponibilidades ON DataInicio <= ";
-	containerAcomodacao += '\'' + dataInicio.getData() + '\'';
-	containerAcomodacao += " AND DataTermino >= ";
-	containerAcomodacao += '\'' + dataTermino.getData() + '\'';
 }
 
 list<Acomodacao> ComandoPesquisaAcomodacao :: getResultado() throw (EErroPersistencia){
 	list<Acomodacao> listaAcomodacao;
 	ElementoResultado resultado;
+	Acomodacao acomodacao_recuperada;
 	Identificador idAcomodacao;
 	TipoDeAcomodacao tipo;
 	CapacidadeDeAcomodacao capacidade;
-	Nome cidade;
-	Estado estado;
-	Acomodacao acomodacao_recuperada;
+	Diaria diaria;
+	
 
 	while(!listaResultado.empty()){
 		// Remove Identificador
@@ -532,7 +556,9 @@ list<Acomodacao> ComandoPesquisaAcomodacao :: getResultado() throw (EErroPersist
    		}
 		resultado = listaResultado.back();
 		listaResultado.pop_back();
+		cout << resultado.getValorColuna() << endl;
 		idAcomodacao.setIdentificador(resultado.getValorColuna());
+		acomodacao_recuperada.setIdentificadorAcomodacao(idAcomodacao);
 
 		// Remove Tipo
 		if (listaResultado.empty()){
@@ -540,7 +566,9 @@ list<Acomodacao> ComandoPesquisaAcomodacao :: getResultado() throw (EErroPersist
    		}
 		resultado = listaResultado.back();
 		listaResultado.pop_back();
+		cout << resultado.getValorColuna() << endl;
 		tipo.setTipoDeAcomodacao(resultado.getValorColuna());
+		acomodacao_recuperada.setTipoAcomodacao(tipo);
 
 		// Remove Capacidade
 		if (listaResultado.empty()){
@@ -548,30 +576,20 @@ list<Acomodacao> ComandoPesquisaAcomodacao :: getResultado() throw (EErroPersist
    		}
 		resultado = listaResultado.back();
 		listaResultado.pop_back();
+		cout << resultado.getValorColuna() << endl;
 		capacidade.setCapacidade(stoi(resultado.getValorColuna()));
-
-		// Remove Cidade
-		if (listaResultado.empty()){
- 	       throw EErroPersistencia("Lista de resultados vazia.");
-   		}
-		resultado = listaResultado.back();
-		listaResultado.pop_back();
-		cidade.setNome(resultado.getValorColuna());
-
-		// Remove Estado		
-		if (listaResultado.empty()){
- 	       throw EErroPersistencia("Lista de resultados vazia.");
-   		}
-		resultado = listaResultado.back();
-		listaResultado.pop_back();
-		estado.setEstado(resultado.getValorColuna());
-
-		acomodacao_recuperada.setIdentificadorAcomodacao(idAcomodacao);
-		acomodacao_recuperada.setTipoAcomodacao(tipo);
 		acomodacao_recuperada.setCapacidadeAcomodacao(capacidade);
-		acomodacao_recuperada.setNomeCidadeAcomodacao(cidade);
-		acomodacao_recuperada.setEstadoAcomodacao(estado);
 
+		// Remove Diaria
+		if (listaResultado.empty()){
+ 	       throw EErroPersistencia("Lista de resultados vazia.");
+   		}
+		resultado = listaResultado.back();
+		listaResultado.pop_back();
+		cout << resultado.getValorColuna() << endl;
+		diaria.setDiaria(stof(resultado.getValorColuna()));
+		acomodacao_recuperada.setDiariaAcomodacao(diaria);
+	
 		listaAcomodacao.push_back(acomodacao_recuperada);
 	}	
 
@@ -692,6 +710,14 @@ bool ComandoVerificaAcomodacaoPertenceUsuario :: getResultado() throw (EErroPers
 }
 
 //---------------------------------------------------------------------------
+//Classe ComandoDescadastrarAcomodacao.
+
+ComandoDescadastrarAcomodacao :: ComandoDescadastrarAcomodacao(Identificador idAcomodacao) {
+        containerAcomodacao = "DELETE FROM Acomodacoes WHERE Identificador = ";
+        containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarDisponibilidade
 
 ComandoCadastrarDisponibilidade :: ComandoCadastrarDisponibilidade (Identificador idAcomodacao, Disponibilidade disponibilidade){
@@ -744,14 +770,6 @@ list<Disponibilidade> ComandoPesquisarDisponibilidade :: getResultado() throw (E
 
 	listaResultado.clear();
 	return listaDisponibilidade;
-}
-
-//---------------------------------------------------------------------------
-//Classe ComandoDescadastrarAcomodacao.
-
-ComandoDescadastrarAcomodacao :: ComandoDescadastrarAcomodacao(Identificador idAcomodacao) {
-        containerAcomodacao = "DELETE FROM Acomodacoes WHERE Identificador = ";
-        containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
 }
 
 //---------------------------------------------------------------------------
@@ -831,49 +849,71 @@ list<Reserva> ComandoPesquisaReserva :: getResultado () throw (EErroPersistencia
 } 
 
 //---------------------------------------------------------------------------
-//Classe ComandoProcuraReserva.
-
-ComandoProcuraReserva :: ComandoProcuraReserva(Identificador id) {
-	containerReserva = "SELECT DataInicio, DataTermino FROM Reservas WHERE IdentificadorUsuario = ";
-	containerReserva += '\'' + id.getIdentificador() + '\'';
+// Classe ComandoPesquisaReservaUsuario
+ComandoPesquisaReservaUsuario :: ComandoPesquisaReservaUsuario (Identificador id){
+	containerReserva = "SELECT IdentificadorAcomodacao, DataInicio, DataTermino FROM Reservas WHERE IdentificadorUsuario = ";
+	containerReserva += "'" + id.getIdentificador() + "'";
 }
 
-list<Reserva> ComandoProcuraReserva :: getResultado() throw (EErroPersistencia){
-	list<Reserva> listaReservas;
+list<Reserva> ComandoPesquisaReservaUsuario :: getResultado() throw (EErroPersistencia){
+	list<Reserva> listaReserva;
+	
 	ElementoResultado resultado;
+
 	Reserva reserva_recuperada;
-	//Identificador idAcomodacao_recuperado;
+	Identificador idAcomodacao_recuperado;
 	Data dataInicio_recuperada;
 	Data dataTermino_recuperada;
 
 	while(!listaResultado.empty()){
-		// Remove DataInicio
+		// Remove IdentificadorAcomodacao
 		if (listaResultado.empty()){
-     	   throw EErroPersistencia("Lista de resultados vazia.");
-    	}
+ 	       throw EErroPersistencia("Lista de resultados vazia.");
+   		}
+		resultado = listaResultado.back();
+		listaResultado.pop_back();
+		idAcomodacao_recuperado.setIdentificador(resultado.getValorColuna());
+		reserva_recuperada.setIdentificadorAcomodacaoReserva(idAcomodacao_recuperado);
+		
+
+		// Remove Data Inicio
+		if (listaResultado.empty()){
+ 	       throw EErroPersistencia("Lista de resultados vazia.");
+   		}
 		resultado = listaResultado.back();
 		listaResultado.pop_back();
 		dataInicio_recuperada.setData(resultado.getValorColuna());
 		reserva_recuperada.setDataInicioReserva(dataInicio_recuperada);
-		cout << "DataInicio: " << dataInicio_recuperada.getData() << endl;
-
-		// Remove DataTermino
+		
+		// Remove Data Termino
 		if (listaResultado.empty()){
-     	   throw EErroPersistencia("Lista de resultados vazia.");
-    	}
+ 	       throw EErroPersistencia("Lista de resultados vazia.");
+   		}
 		resultado = listaResultado.back();
 		listaResultado.pop_back();
 		dataTermino_recuperada.setData(resultado.getValorColuna());
 		reserva_recuperada.setDataTerminoReserva(dataTermino_recuperada);
-		cout << "DataTermino: " << dataTermino_recuperada.getData() << endl;
 
-		// Insere na lista de reservas
+		// Insere na lista de reserva
 		
-		listaReservas.push_back( reserva_recuperada );
+		listaReserva.push_back( reserva_recuperada );
 	}
 
 	listaResultado.clear();
-	return listaReservas;
+	return listaReserva;
+}
+
+//---------------------------------------------------------------------------
+// Classe ComandoDescadastraReserva
+ComandoDescadastraReserva :: ComandoDescadastraReserva (Identificador id, Identificador idAcomodacao, Data dataInicio, Data dataTermino){
+	containerReserva = "DELETE FROM Reservas WHERE IdentificadorUsuario = ";
+	containerReserva += '\'' + id.getIdentificador() + '\'';
+	containerReserva += " AND IdentificadorAcomodacao = ";
+	containerReserva += '\'' + idAcomodacao.getIdentificador() + '\'';
+	containerReserva += " AND DataInicio = ";
+	containerReserva += '\'' + dataInicio.getData() + '\'';
+	containerReserva += " AND DataTermino = ";
+	containerReserva += '\'' + dataTermino.getData() + '\'';
 }
 
 //---------------------------------------------------------------------------
@@ -892,7 +932,6 @@ int CntrServAutenticacao :: autenticar(Identificador *id, Senha *senha){
 	catch(EErroPersistencia exp){
 		cout << endl << exp.what();
 		cout << endl << endl << "Digite algo para continuar.";
-		// getch();
 	}
 	
     if (senha_recuperada == senha->getSenha()){
@@ -953,7 +992,50 @@ int CntrServUsuario :: cadastrar(Nome* nome, Identificador* identificador, Senha
 }
 
 int CntrServUsuario :: descadastrarUsuario(Identificador* id){
+	int resultado;
+	list<Acomodacao> listaAcomodacao;
+	list<Reserva> listaReserva;
 
+	ComandoProcuraAcomodacao comandoPesquisa (*id);
+	try{
+		comandoPesquisa.executar();
+		listaAcomodacao = comandoPesquisa.getResultado();
+	}
+	catch (EErroPersistencia){
+	}
+
+	if(!listaAcomodacao.empty()){
+		listaAcomodacao.clear();
+		listaReserva.clear();
+		return USUARIO_POSSUI_ACOMODACAO;
+	}
+
+	ComandoPesquisaReservaUsuario comandoPesquisaReserva (*id);
+	try{
+		comandoPesquisaReserva.executar();
+		listaReserva = comandoPesquisaReserva.getResultado();
+	}
+	catch (EErroPersistencia){
+
+	}
+
+	if(!listaReserva.empty()){
+		listaAcomodacao.clear();
+		listaReserva.clear();
+		return USUARIO_POSSUI_RESERVA;
+	}
+
+	ComandoRemoverUsuario comandoDescadastrar (*id);
+	try{
+		comandoDescadastrar.executar();
+	}
+	catch (EErroPersistencia){
+
+	}
+
+	listaAcomodacao.clear();
+	listaReserva.clear();
+	return resultado;
 }
 
 int CntrServUsuario :: cadastrarContaCorrente(Identificador* identificador, NumeroDeContaCorrente* conta, Agencia* agencia, Banco* banco){
@@ -1078,36 +1160,15 @@ int CntrServUsuario :: cadastrarCartaoDeCredito(Identificador* id, NumeroDeCarta
 
 int CntrServUsuario :: descadastrarCartaoDeCredito(Identificador* id){
 	int resultado;
-	list<Reserva> listaReservas;
 
-	ComandoProcuraReserva comandoProcura(*id);
+	ComandoDescadastrarCartaoDeCredito comando (*id);
 
 	try{
-		comandoProcura.executar();
-		listaReservas = comandoProcura.getResultado();
-
-	}
-	catch (EErroPersistencia){
-		resultado = FALHA;
-	}
-
-
-	if(listaReservas.empty()){
-		
-		ComandoDescadastrarCartaoDeCredito comando (*id);
-		
-		try{
-			comando.executar();
-		}
-		catch (EErroPersistencia){
-			resultado = FALHA;
-		}
-
+		comando.executar();
 		resultado = SUCESSO;
-   	}
-	else{
-
-		resultado = RESERVA_AINDA_CADASTRADA;
+	}
+	catch (EErroPersistencia) {
+		resultado = FALHA;
 	}
 
 	return resultado;
@@ -1175,56 +1236,87 @@ int CntrServAcomodacao :: cadastrar(Identificador *id, Identificador *idAcomodac
 	return resultado;	
 }
 
-int CntrServAcomodacao :: consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado){
+list<Acomodacao> CntrServAcomodacao :: consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado){
 	list<Acomodacao> listaAcomodacao;
 	list<Acomodacao> :: iterator it;
+	list<Acomodacao> :: iterator it_auxiliar;
 	Acomodacao acomodacao_recuperada;
+	Identificador id_usu;
 
+	
 	ComandoPesquisaAcomodacao comandoPesquisar (*id, *dataInicio, *dataTermino, *capacidade, *cidade, *estado);
 	try{
 		comandoPesquisar.executar();
 		listaAcomodacao = comandoPesquisar.getResultado();
-		if(listaAcomodacao.empty()){
-			return ACOMODACAO_NAO_ENCONTRADA;
-		}
-		else{
-			for(it = listaAcomodacao.begin(); it != listaAcomodacao.end(); ++it){
-				acomodacao_recuperada = *it;
-				cout << "++" << acomodacao_recuperada.getIdentificadorAcomodacao().getIdentificador() << endl;
-			}
-		}
+		cout << "Tam " << listaAcomodacao.size() << endl;
+		
 	}
 	catch (EErroPersistencia){
 
 	}
+
+	for(it = listaAcomodacao.begin(); it != listaAcomodacao.end(); ++it){
+		 cout << it->getIdentificadorAcomodacao().getIdentificador() << endl;
+		 cout << it->getTipoAcomodacao().getTipoDeAcomodacao() << endl;
+		 cout << it->getCapacidadeAcomodacao().getCapacidade() << endl;
+		 cout << it->getDiariaAcomodacao().getDiaria() << endl << endl;	
+	}
+
+	return listaAcomodacao;
 }
 
-int CntrServAcomodacao :: descadastrar(Identificador *id, Identificador *idAcomodacao){
-	int resultado;
-	int IDAcomodacao_recuperado;
-
-	ComandoVerificaAcomodacaoPertenceUsuario comandoAcomodacao(*id , *idAcomodacao);
-	ComandoDescadastrarAcomodacao comando(*idAcomodacao);
-
-
+list<Acomodacao> CntrServAcomodacao :: buscarAcomodacao (Identificador *id){
+	list<Acomodacao> listaAcomodacao;
+	list<Acomodacao> :: iterator it;
+	ComandoProcuraAcomodacao comandoPesquisar (*id);
 	try{
-		comandoAcomodacao.executar();
-		IDAcomodacao_recuperado = comandoAcomodacao.getResultado();
+		comandoPesquisar.executar();
+		listaAcomodacao = comandoPesquisar.getResultado();	
+	}
+	catch (EErroPersistencia){
+		
+	}
 
-		if(IDAcomodacao_recuperado == true){
-			comando.executar();
-			resultado = SUCESSO;
-		}
-		else if (IDAcomodacao_recuperado == false) {
-			resultado = NAO_ANFITRIAO;
-		}	
+	for(it = listaAcomodacao.begin(); it != listaAcomodacao.end(); ++it){
 
 	}
+	return listaAcomodacao;
+}
+
+int CntrServAcomodacao :: descadastrar (Identificador *id, Identificador *idAcomodacao){
+	int resultado;
+	int IDAcomodacao_recuperado;
+	list<Reserva> reserva_recuperada;
+
+	ComandoVerificaAcomodacaoPertenceUsuario comandoAcomodacao(*id , *idAcomodacao);
+	ComandoPesquisaReserva comandoReserva(*idAcomodacao);
+	ComandoDescadastrarTodasDisponibilidadesAcomodacao comandoDescadastrar(*idAcomodacao);
+	ComandoDescadastrarAcomodacao comando(*idAcomodacao);
+	
+	try{
+		comandoAcomodacao.executar();
+		comandoReserva.executar();
+
+		IDAcomodacao_recuperado = comandoAcomodacao.getResultado();
+		reserva_recuperada = comandoReserva.getResultado();
+
+		if(IDAcomodacao_recuperado == true && reserva_recuperada.empty()){
+			comando.executar();
+			comandoDescadastrar.executar();
+			resultado = SUCESSO;
+		}
+		else if(IDAcomodacao_recuperado == false) {
+			resultado = NAO_ANFITRIAO;
+		}
+		else if(!reserva_recuperada.empty()) {
+			resultado = AINDA_RESERVADA;
+		}
+	}
+
 	catch (EErroPersistencia) {
 		resultado = FALHA;
 	}
 
-	cout << "Resultado: " << resultado << endl;
 	return resultado;
 }
 
@@ -1296,136 +1388,136 @@ int CntrServAcomodacao :: reservar(Identificador *id, Identificador *idAcomodaca
 				terminoDisponibilidadeOriginal = disponibilidadeOriginal.getDataTerminoDisponibilidade();
 				
 				if(true){
-				if(!(Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == -1) &&
-				     !(Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 1)){
-					cout << "Reserva dentro do intervalo:" << endl;
-					cout << disponibilidadeOriginal.getDataInicioDisponibilidade().getData() << endl;
-					cout << disponibilidadeOriginal.getDataTerminoDisponibilidade().getData() << endl;
+					if(!(Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == -1) &&
+						!(Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 1)){
+						cout << "Reserva dentro do intervalo:" << endl;
+						cout << disponibilidadeOriginal.getDataInicioDisponibilidade().getData() << endl;
+						cout << disponibilidadeOriginal.getDataTerminoDisponibilidade().getData() << endl;
 
-					ComandoCadastrarReserva comandoCadastrar (*id, *idAcomodacao, reserva);
-
-					try{
-						comandoCadastrar.executar();
-					}
-					catch (EErroPersistencia){
-						
-					}
-					
-					ComandoDescadastrarDisponibilidade comandoDescadastrar (*idAcomodacao, disponibilidadeOriginal);
-
-					try{
-						comandoDescadastrar.executar();
-					}
-					catch (EErroPersistencia){
-
-					}
-					
-					// Caso: Reserva ocupa todo o intervalo de disponibilidade
-					if ((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 0) &&
-					    (Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 0)){
-						cout << "Reserva ocupar o intervalo fechado" << endl;
-						// Sem nova disponibilidade
-					}
-
-					// Caso: Reserva começa no extremo inicial do intervalo de disponibilidade
-					else if ((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 0) &&
-					         (Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == -1)){
-						cout << "Reserva no extremo inicial do intervalo" << endl;
-						
-						// Deve gerar uma nova disponibilidade que fica a direita, na linha temporal, do intervalo reservado
-						inicioDisponibilidadeModificadaDireita = dataTermino->getDataPosterior();
-						terminoDisponibilidadeModificadaDireita = terminoDisponibilidadeOriginal;
-
-						cout << "Novo intervalo:" << endl;
-						cout << inicioDisponibilidadeModificadaDireita.getData() << endl;
-						cout << terminoDisponibilidadeModificadaDireita.getData() << endl;
-						
-						disponibilidadeModificadaDireita.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaDireita );
-						disponibilidadeModificadaDireita.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaDireita );
-
-						//  Cadastrar o intervalo de disponibilidade que é devolvido para as Disponibilidades; o que sobre da reserva
-						ComandoCadastrarDisponibilidade comandoCadastrar (*idAcomodacao, disponibilidadeModificadaDireita);
+						ComandoCadastrarReserva comandoCadastrar (*id, *idAcomodacao, reserva);
 
 						try{
 							comandoCadastrar.executar();
 						}
 						catch (EErroPersistencia){
-
+							
 						}
-					}
-
-					// Caso: Reserva termina no extremo final do intervalo de disponibilidade
-					else if((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 1) &&
-					        (Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 0)){
-						cout << "Reverva no extremo final do intervalo" << endl;
-
-						// Deve gerar uma nova disponibilidade que fica a esquerda, na linha temporal, do intervalo reservado
-						inicioDisponibilidadeModificadaEsquerda = inicioDisponibilidadeOriginal;
-						terminoDisponibilidadeModificadaEsquerda = dataInicio->getDataAnterior();
-
-						cout << "Novo intervalo:" << endl;
-						cout << inicioDisponibilidadeModificadaEsquerda.getData() << endl;
-						cout << terminoDisponibilidadeModificadaEsquerda.getData() << endl;
-
-						disponibilidadeModificadaEsquerda.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaEsquerda );
-						disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaEsquerda );
-
-						//  Cadastrar o intervalo de disponibilidade que é devolvido para as Disponibilidades; o que sobre da reserva
-						ComandoCadastrarDisponibilidade comandoCadastrar (*idAcomodacao, disponibilidadeModificadaEsquerda);
+						
+						ComandoDescadastrarDisponibilidade comandoDescadastrar (*idAcomodacao, disponibilidadeOriginal);
 
 						try{
-							comandoCadastrar.executar();
+							comandoDescadastrar.executar();
 						}
 						catch (EErroPersistencia){
 
 						}
+						
+						// Caso: Reserva ocupa todo o intervalo de disponibilidade
+						if ((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 0) &&
+							(Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 0)){
+							cout << "Reserva ocupar o intervalo fechado" << endl;
+							// Sem nova disponibilidade
+						}
+
+						// Caso: Reserva começa no extremo inicial do intervalo de disponibilidade
+						else if ((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 0) &&
+								(Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == -1)){
+							cout << "Reserva no extremo inicial do intervalo" << endl;
+							
+							// Deve gerar uma nova disponibilidade que fica a direita, na linha temporal, do intervalo reservado
+							inicioDisponibilidadeModificadaDireita = dataTermino->getDataPosterior();
+							terminoDisponibilidadeModificadaDireita = terminoDisponibilidadeOriginal;
+
+							cout << "Novo intervalo:" << endl;
+							cout << inicioDisponibilidadeModificadaDireita.getData() << endl;
+							cout << terminoDisponibilidadeModificadaDireita.getData() << endl;
+							
+							disponibilidadeModificadaDireita.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaDireita );
+							disponibilidadeModificadaDireita.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaDireita );
+
+							//  Cadastrar o intervalo de disponibilidade que é devolvido para as Disponibilidades; o que sobre da reserva
+							ComandoCadastrarDisponibilidade comandoCadastrar (*idAcomodacao, disponibilidadeModificadaDireita);
+
+							try{
+								comandoCadastrar.executar();
+							}
+							catch (EErroPersistencia){
+
+							}
+						}
+
+						// Caso: Reserva termina no extremo final do intervalo de disponibilidade
+						else if((Data :: comparaDatas(*dataInicio, inicioDisponibilidadeOriginal) == 1) &&
+								(Data :: comparaDatas(*dataTermino, terminoDisponibilidadeOriginal) == 0)){
+							cout << "Reverva no extremo final do intervalo" << endl;
+
+							// Deve gerar uma nova disponibilidade que fica a esquerda, na linha temporal, do intervalo reservado
+							inicioDisponibilidadeModificadaEsquerda = inicioDisponibilidadeOriginal;
+							terminoDisponibilidadeModificadaEsquerda = dataInicio->getDataAnterior();
+
+							cout << "Novo intervalo:" << endl;
+							cout << inicioDisponibilidadeModificadaEsquerda.getData() << endl;
+							cout << terminoDisponibilidadeModificadaEsquerda.getData() << endl;
+
+							disponibilidadeModificadaEsquerda.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaEsquerda );
+							disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaEsquerda );
+
+							//  Cadastrar o intervalo de disponibilidade que é devolvido para as Disponibilidades; o que sobre da reserva
+							ComandoCadastrarDisponibilidade comandoCadastrar (*idAcomodacao, disponibilidadeModificadaEsquerda);
+
+							try{
+								comandoCadastrar.executar();
+							}
+							catch (EErroPersistencia){
+
+							}
+						}
+						else{
+							cout << "Reserva no interior do intervalo, exceto os extremos" << endl;
+
+							// Deve gerar duas novas disponibilidades, a esquerda e a direita, na linha temporal, do intervalo reservado
+							inicioDisponibilidadeModificadaEsquerda = inicioDisponibilidadeOriginal;
+							terminoDisponibilidadeModificadaEsquerda = dataInicio->getDataAnterior();
+
+							inicioDisponibilidadeModificadaDireita = dataTermino->getDataPosterior();
+							terminoDisponibilidadeModificadaDireita = terminoDisponibilidadeOriginal;
+
+							cout << "Novo intervalo (esquerdo)"	<< endl;
+							cout << inicioDisponibilidadeModificadaEsquerda.getData() << endl;
+							cout << terminoDisponibilidadeModificadaEsquerda.getData() << endl;
+
+							disponibilidadeModificadaEsquerda.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaEsquerda );
+							disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaEsquerda );
+
+							cout << "Novo intervalo (direito)"	<< endl;
+							cout << inicioDisponibilidadeModificadaDireita.getData() << endl;
+							cout << terminoDisponibilidadeModificadaDireita.getData() << endl;
+
+							disponibilidadeModificadaDireita.setDataInicioDisponibilidade( inicioDisponibilidadeModificadaDireita );
+							disponibilidadeModificadaDireita.setDataTerminoDisponibilidade( terminoDisponibilidadeModificadaDireita );
+
+							//  Cadastrar os intervalos de disponibilidade que sao devolvidos para as Disponibilidades; o que sobre da reserva
+							ComandoCadastrarDisponibilidade comandoCadastrarEsquerda (*idAcomodacao, disponibilidadeModificadaEsquerda);
+							try{
+								comandoCadastrarEsquerda.executar();
+							}
+							catch (EErroPersistencia){
+
+							}
+
+							ComandoCadastrarDisponibilidade comandoCadastrarDireita (*idAcomodacao, disponibilidadeModificadaDireita);
+							try{
+								comandoCadastrarDireita.executar();
+							}
+							catch (EErroPersistencia){
+
+							}
+
+						}
+					
+						resultado =  SUCESSO;	
+						break;
 					}
-					else{
-						cout << "Reserva no interior do intervalo, exceto os extremos" << endl;
-
-						// Deve gerar duas novas disponibilidades, a esquerda e a direita, na linha temporal, do intervalo reservado
-						inicioDisponibilidadeModificadaEsquerda = inicioDisponibilidadeOriginal;
-						terminoDisponibilidadeModificadaEsquerda = dataInicio->getDataAnterior();
-
-						inicioDisponibilidadeModificadaDireita = dataTermino->getDataPosterior();
-						terminoDisponibilidadeModificadaDireita = terminoDisponibilidadeOriginal;
-
-						cout << "Novo intervalo (esquerdo)"	<< endl;
-						cout << inicioDisponibilidadeModificadaEsquerda.getData() << endl;
-						cout << terminoDisponibilidadeModificadaEsquerda.getData() << endl;
-
-						disponibilidadeModificadaEsquerda.setDataInicioDisponibilidade ( inicioDisponibilidadeModificadaEsquerda );
-						disponibilidadeModificadaEsquerda.setDataTerminoDisponibilidade ( terminoDisponibilidadeModificadaEsquerda );
-
-						cout << "Novo intervalo (direito)"	<< endl;
-						cout << inicioDisponibilidadeModificadaDireita.getData() << endl;
-						cout << terminoDisponibilidadeModificadaDireita.getData() << endl;
-
-						disponibilidadeModificadaDireita.setDataInicioDisponibilidade( inicioDisponibilidadeModificadaDireita );
-						disponibilidadeModificadaDireita.setDataTerminoDisponibilidade( terminoDisponibilidadeModificadaDireita );
-
-						//  Cadastrar os intervalos de disponibilidade que sao devolvidos para as Disponibilidades; o que sobre da reserva
-						ComandoCadastrarDisponibilidade comandoCadastrarEsquerda (*idAcomodacao, disponibilidadeModificadaEsquerda);
-						try{
-							comandoCadastrarEsquerda.executar();
-						}
-						catch (EErroPersistencia){
-
-						}
-
-						ComandoCadastrarDisponibilidade comandoCadastrarDireita (*idAcomodacao, disponibilidadeModificadaDireita);
-						try{
-							comandoCadastrarDireita.executar();
-						}
-						catch (EErroPersistencia){
-
-						}
-
-					}
-				
-					resultado =  SUCESSO;	
-					break;
-				}
 				}
 			}
 
@@ -1443,8 +1535,86 @@ int CntrServAcomodacao :: reservar(Identificador *id, Identificador *idAcomodaca
 	return resultado;
 }
 
-int CntrServAcomodacao :: cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){
+list<Reserva> CntrServAcomodacao:: buscarReserva (Identificador *id){
+	list<Reserva> listaReserva;
 
+	ComandoPesquisaReservaUsuario comandoPesquisaReserva (*id);
+	try{
+		comandoPesquisaReserva.executar();
+		listaReserva = comandoPesquisaReserva.getResultado();
+	}
+	catch (EErroPersistencia){
+	}
+
+	return listaReserva;
+}
+
+int CntrServAcomodacao :: cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino, Data *dataAtual){
+	int resultado;
+	bool confirmaDatas = false;
+	Identificador *idProprietarioAcomodacao = new Identificador();
+	list<Reserva> listaReserva;
+	list<Reserva> :: iterator it;
+	if (!(Data :: comparaDatas(*dataAtual, *dataInicio) == -1)){
+		return RESERVA_NAO_PODE_SER_CANCELADA;
+	}
+	
+	// Verifica se o usuário possui a acomodacao reservada
+	ComandoPesquisaReservaUsuario comandoPesquisa (*id);
+	try{
+		comandoPesquisa.executar();
+		listaReserva = comandoPesquisa.getResultado();
+	}
+	catch (EErroPersistencia){
+
+	}
+
+	if(listaReserva.empty()){
+		return NAO_EXISTE_RESERVAS;
+	}
+	
+	for(it = listaReserva.begin(); it != listaReserva.end(); ++it){
+		if(it->getIdentificadorAcomodacaoReserva().getIdentificador() != idAcomodacao->getIdentificador()){
+			return ACOMODACAO_NAO_ENCONTRADA;
+		}
+		if(it->getDataInicioReserva().getData() == dataInicio->getData() &&
+		   it->getDataTerminoReserva().getData() == dataTermino->getData()){
+			   confirmaDatas = true;
+		}
+	}
+
+	// Se nao existe nenhuma reserva com a data informada
+	if (confirmaDatas == false){
+		return RESERVA_NAO_ENCONTRADA;
+	}
+
+	// Descadastra Reserva
+	ComandoDescadastraReserva comandoDescadastrar (*id, *idAcomodacao, *dataInicio, *dataTermino);
+	try{
+		comandoDescadastrar.executar();
+	}
+	catch (EErroPersistencia){
+		resultado = FALHA;
+	}
+
+	// Devolve o período reservado para a disponibilidade;
+	// Procura o identificador do proprietario da acomodacao que foi reservada para permitir o
+	// novo cadastro de disponibilidade;
+	ComandoPesquisaProprietarioAcomodacao comandoProcuraProprietario (*idAcomodacao);
+	try{
+		comandoProcuraProprietario.executar();
+		idProprietarioAcomodacao->setIdentificador(comandoProcuraProprietario.getResultado());
+	}
+	catch (EErroPersistencia){
+
+	}
+
+	cadastrarDisp (idProprietarioAcomodacao, idAcomodacao, dataInicio, dataTermino);
+	
+	resultado = SUCESSO;
+
+	delete idProprietarioAcomodacao;
+	return resultado;
 }
 
 int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){
@@ -1489,7 +1659,7 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 		if(!listaReservasCadastradas.empty()){
 			for(it_reserva = listaReservasCadastradas.begin(); it_reserva != listaReservasCadastradas.end(); ++it_reserva){
 				reserva_recuperada = *it_reserva;
-				// PENSAR NAS CONDIÇÕES DISSO AQUI
+				
 				if(!(((Data :: comparaDatas(novaDisponibilidade.getDataInicioDisponibilidade(), reserva_recuperada.getDataInicioReserva()) == 1) && 
 				      (Data :: comparaDatas(novaDisponibilidade.getDataInicioDisponibilidade(), reserva_recuperada.getDataTerminoReserva()) == 1)) ||
 					 ((Data :: comparaDatas(novaDisponibilidade.getDataTerminoDisponibilidade(), reserva_recuperada.getDataInicioReserva()) == -1) &&
@@ -1542,7 +1712,7 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 				// Se a data anterior ao inicio da primeira disponibilidade for igual ao termino da segunda disponibilidade
 				// Então é o caso: INTERVALO ADJACENTE A ESQUERDA
 				cout << "Intervalo adjacente a esquerda" << endl;
-
+				
 			}
 
 			// Caso: Intervalo adjacente a direita		
@@ -1553,7 +1723,6 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 				cout << "Intervalo adjacente a direita" << endl;
 				cout << it->getDataTerminoDisponibilidade().getData() << '=' << it_proximo->getDataTerminoDisponibilidade().getData() << endl;
 				it->setDataTerminoDisponibilidade(it_proximo->getDataTerminoDisponibilidade());
-				// cout << it->getDataTerminoDisponibilidade().getData() << '=' << it_proximo->getDataTerminoDisponibilidade().getData() << endl;
 
 				cout << "tam " << listaDisponibilidade.size() << endl;
 				for(it_print = listaDisponibilidade.begin(); it_print != listaDisponibilidade.end(); ++it_print){
@@ -1566,6 +1735,8 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 				for(it_print = listaDisponibilidade.begin(); it_print != listaDisponibilidade.end(); ++it_print){
 					cout << it_print->getDataInicioDisponibilidade().getData() << ' ' << it_print->getDataTerminoDisponibilidade().getData() << endl;
 				}
+
+				houveUniao = true;
 			}
 
 			// Caso: Intervalo parcialmente coincidente a esquerda
@@ -1577,6 +1748,7 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 				// E se ,além disso, o inicio da primeira disponibilidade for maior que o inicio da segunda
 				// Então o caso é INTERVALO PARCIALMENTE COINCIDENTE A ESQUERDA
 				cout << "Caso: Intervalo parcialmente coincidente a esquerda" << endl;
+
 			}
 
 			// Caso: Intervalo parcialmente coincidente a direita
@@ -1594,18 +1766,17 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 				
 				cout << "tam " << listaDisponibilidade.size() << endl;
 				for(it_print = listaDisponibilidade.begin(); it_print != listaDisponibilidade.end(); ++it_print){
-					cout << it_print->getDataInicioDisponibilidade().getData() << endl;
-					cout << it_print->getDataTerminoDisponibilidade().getData() << endl;
+					cout << it_print->getDataInicioDisponibilidade().getData() << ' ' << it_print->getDataTerminoDisponibilidade().getData() << endl;
 				}
 
 				// Apaga it_proximo
 				listaDisponibilidade.erase(it_proximo);
 				cout << "tam " << listaDisponibilidade.size() << endl;
 				for(it_print = listaDisponibilidade.begin(); it_print != listaDisponibilidade.end(); ++it_print){
-					cout << it_print->getDataInicioDisponibilidade().getData() << endl;
-					cout << it_print->getDataTerminoDisponibilidade().getData() << endl;
+					cout << it_print->getDataInicioDisponibilidade().getData() << ' ' << it_print->getDataTerminoDisponibilidade().getData() << endl;
 				}
 				
+				houveUniao = true;
 			}
 
 			// Caso: Intervalo totalmente coincidente interno
@@ -1616,7 +1787,19 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 				// Então o caso é INTERVALO TOTALMENTE COINCIDENTE INTERNO
 				cout << "Intervalo totalmente coincidente interno" << endl;
 
-				// Apagar o it_proximo
+				cout << "tam " << listaDisponibilidade.size() << endl;
+				for(it_print = listaDisponibilidade.begin(); it_print != listaDisponibilidade.end(); ++it_print){
+					cout << it_print->getDataInicioDisponibilidade().getData() << ' ' << it_print->getDataTerminoDisponibilidade().getData() << endl;
+				}
+
+				// Apaga it_proximo
+				listaDisponibilidade.erase(it_proximo);
+				cout << "tam " << listaDisponibilidade.size() << endl;
+				for(it_print = listaDisponibilidade.begin(); it_print != listaDisponibilidade.end(); ++it_print){
+					cout << it_print->getDataInicioDisponibilidade().getData() << ' ' << it_print->getDataTerminoDisponibilidade().getData() << endl;
+				}
+				
+				houveUniao = true;
 			}
 
 			// Caso: Intervalo totalmente coincidente externo
@@ -1641,19 +1824,15 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 				cout << "Nao ha união" << endl;
 			}
 
-			char c = getchar();
 		}
 		
 		// Verifica se o proximo do proximo é o final da lista. Encerra o loop se for verdade.
 		it_auxiliar = it_proximo;
 		++it_auxiliar;
-		if(it_auxiliar == listaDisponibilidade.end()){
+		if(it_auxiliar == listaDisponibilidade.end() || it_proximo == listaDisponibilidade.end()){
 			cout << "Chegou no final da lista" << endl;
 			break;
 		}
-
-		
-		
 	}
 
 	// Se houve uniao de algum intervalo, remove todas as disponibilidades do banco de dados da acomodação
@@ -1670,18 +1849,47 @@ int CntrServAcomodacao :: cadastrarDisp(Identificador *id, Identificador *idAcom
 		}
 	}
 
-	// Cadastra a disponibilidade
-	/*
-	ComandoCadastrarDisponibilidade comando (*idAcomodacao, disponibilidade);
+	if(houveUniao == false){
+		cout << "Nao houve uniao" << endl;
+		// Cadastra a nova disponibilidade
+		ComandoCadastrarDisponibilidade comando (*idAcomodacao, novaDisponibilidade);
+		
+		try{
+			comando.executar();
+			resultado = SUCESSO;
+		}
+		catch (ElementoResultado){
+			resultado = FALHA;
+		}
+	}
+	else{
+		cout << "Apague tudo e insira novamente " << endl;
+		// Deleta todas as disponibilidades da acomodacao
 
-	try{
-		comando.executar();
-		resultado = SUCESSO;
+		ComandoDescadastrarTodasDisponibilidadesAcomodacao comandoDescadastrar (*idAcomodacao);
+		try{
+			comandoDescadastrar.executar();
+		}
+		catch (ElementoResultado){
+			resultado = FALHA;
+		}
+
+		// Grava toda a lista de disponibilidades, ja com as modificacoes necessarias
+		for (it_auxiliar = listaDisponibilidade.begin(); it_auxiliar != listaDisponibilidade.end(); ++it_auxiliar){
+			novaDisponibilidade = *it_auxiliar;
+			
+			ComandoCadastrarDisponibilidade comando (*idAcomodacao, novaDisponibilidade);
+		
+			try{
+				comando.executar();
+				resultado = SUCESSO;
+			}
+			catch (ElementoResultado){
+				resultado = FALHA;
+			}
+		}
 	}
-	catch (ElementoResultado){
-		resultado = FALHA;
-	}
-	*/
+
 	return resultado;
 }
 
@@ -1689,5 +1897,30 @@ int CntrServAcomodacao :: descadastrarDisp(Identificador *id, Identificador *idA
 	int resultado;
 	Disponibilidade disponibilidade_descadastrada;
 
-	// ComandoDescadastrarDisponibilidade (*id, );
+	disponibilidade_descadastrada.setDataInicioDisponibilidade(*dataInicio);
+	disponibilidade_descadastrada.setDataTerminoDisponibilidade(*dataTermino);
+
+	// Verifica se acomodacao pertence ao usuario
+	ComandoVerificaAcomodacaoPertenceUsuario comandoVerificaPropriedadeDaAcomodacao (*id, *idAcomodacao);
+	try{
+		comandoVerificaPropriedadeDaAcomodacao.executar();
+		resultado = comandoVerificaPropriedadeDaAcomodacao.getResultado();
+		if(resultado == false){
+			return ACOMODACAO_NAO_PERTECE_USUARIO;
+		}
+	}
+	catch (EErroPersistencia){
+		resultado = FALHA;
+	}
+
+	ComandoDescadastrarDisponibilidade comandoDescadastrar (*idAcomodacao, disponibilidade_descadastrada);
+	try{
+		comandoDescadastrar.executar();
+		resultado = SUCESSO;
+	}
+	catch (EErroPersistencia){
+		resultado = FALHA;
+	}
+
+	return resultado;
 }

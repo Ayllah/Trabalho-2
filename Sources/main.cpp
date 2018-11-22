@@ -17,5 +17,6 @@ int main(){
 	
 	cntr->menu();
 
+	delete cntr;
 	return 0;
 }

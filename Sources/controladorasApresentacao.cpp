@@ -48,8 +48,7 @@ int CntrAprUsuario :: menuMinhaConta(Identificador *id) throw(runtime_error){
 	cntrAutenticacao->setServidor(servidorAutenticacao);
 
 	while(true){
-		cout << endl << "-------------- Minha Conta ---------------" << endl;
-		//cout << EDITAR << " - Editar Perfil de Usuario" << endl;
+		cout << endl << "-------------- Minha Conta ---------------" << endl;		
 		cout << MENU_CONTA_CORRENTE << " - Gerenciar Dados da Conta Corrente" << endl;
 		cout << MENU_CARTAO_DE_CREDITO << " - Gerenciar Dados do Cartao de Credito" << endl;
 		cout << DESCADASTRAR << " - Descadastrar minha conta"<< endl;
@@ -70,11 +69,7 @@ int CntrAprUsuario :: menuMinhaConta(Identificador *id) throw(runtime_error){
 				case MENU_CARTAO_DE_CREDITO:
 					resultado = menuCartaoDeCredito(id);
 					break;
-				/*
 				
-				
-				*/
-
 				case DESCADASTRAR:
 					cout << "Para sua seguranca, sera preciso que voce se autentique novamente" << endl;
 
@@ -84,8 +79,17 @@ int CntrAprUsuario :: menuMinhaConta(Identificador *id) throw(runtime_error){
 						
 						if(resultado == SUCESSO){
 							cout << "Usuario removido do sistema" << endl;
-							break;
-						}				
+							return DESCADASTRADO;
+						}
+						else if (resultado == USUARIO_POSSUI_ACOMODACAO){
+							cout << "Voce nao pode se descadastrar do sistema se possuir acomodacoes cadastradas." << endl;
+						}
+						else if (resultado == USUARIO_POSSUI_RESERVA){
+							cout << "Voce nao pode se descastrar se possuir uma reserva cadastrada" << endl;
+						}
+						else if (resultado == FALHA){
+							cout << "Erro ao tentar descadastrar" << endl;
+						}
 					}
 					else{
 						cout << "Falha na autenticacao" << endl;
@@ -205,12 +209,6 @@ int CntrAprUsuario :: menuCartaoDeCredito(Identificador *id) throw(runtime_error
 					resultado = descadastrarCartaoDeCredito(id);
 					if(resultado == SUCESSO){
 						cout << "Cartão REMOVIDO!" << endl;
-					}
-					else if (resultado == RESERVA_AINDA_CADASTRADA){
-						cout << "Erro! Usuario possui acomodacao reservada." << endl;
-					}
-					else if (resultado == FALHA){
-						cout << "Erro ao tentar descadastrar cartao de credito." << endl;
 					}
 					break;
 			}
@@ -479,7 +477,7 @@ int CntrAprUsuario :: executar (Identificador *id) throw (runtime_error){
 			}
 		
 		
-			if(stoi(opcao) == SAIR){
+			if(stoi(opcao) == SAIR || resultado == DESCADASTRADO){
 				break;
 			}
 		}
@@ -495,6 +493,8 @@ int CntrAprUsuario :: executar (Identificador *id) throw (runtime_error){
 int CntrAprAcomodacao :: consultar(Identificador *id){
 	int resultado;
 	string entrada;
+	list<Acomodacao> listaAcomodacao;
+	list<Acomodacao> :: iterator it;
 	Data *dataInicio = new Data();
 	Data *dataTermino = new Data();
 	CapacidadeDeAcomodacao *capacidade = new CapacidadeDeAcomodacao();
@@ -524,7 +524,7 @@ int CntrAprAcomodacao :: consultar(Identificador *id){
 		cout << endl << "Formato invalido! Tente novamente." << endl;
 	}
 
-	resultado = servidor->consultar(id, dataInicio, dataTermino, capacidade, nomeCidade, estado);
+	listaAcomodacao = servidor->consultar(id, dataInicio, dataTermino, capacidade, nomeCidade, estado);
 	
 	if(resultado == ACOMODACAO_NAO_ENCONTRADA){
 		cout << "Busca nao encontrou nenhuma acomodacao" << endl;
@@ -548,10 +548,13 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 		cout << endl << "Painel de Acomodacao:" << endl << endl;
 
         cout << CADASTRAR_ACOMODACAO << " - Cadastrar Acomodacao         " << endl;
-        cout << DESCADASTRAR_ACOMODACAO << " - Descadastrar Acomodacao      " << endl;
-        cout << RESERVAR_ACOMODACAO << " - Reservar Acomodacao          " << endl;
+        cout << EXIBIR_ACOMODACAO << " - Exibir minhas acomodacoes         " << endl; 
+		cout << DESCADASTRAR_ACOMODACAO << " - Descadastrar Acomodacao      " << endl;
+		cout << RESERVAR_ACOMODACAO << " - Reservar Acomodacao          " << endl;
+		cout << EXIBIR_RESERVA << " - Exibir minhas reservas        " << endl;
         cout << CANCELAR_RESERVA << " - Cancelar Reserva             " << endl;
         cout << CADASTRAR_DISPONIBILIDADE << " - Cadastrar Disponibilidade    " << endl;
+		cout << EXIBIR_DISPONIBILIDADE << " - Exibir os periodos de disponibilidade de uma acomodacao    " << endl;
         cout << DESCADASTRAR_DISPONIBILIDADE << " - Descadastrar Disponibilidade " << endl;
         cout << RETORNAR << " - Retornar                     " << endl << endl;
         cout << "Selecione uma opcao : ";
@@ -583,13 +586,23 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 					if(resultado == SUCESSO){
 						cout << "Acomodacao descadastrada com sucesso!" << endl;
 					}
-					/*else if (resultado == ACOMODACAO_RESERVADA){
+					else if (resultado == AINDA_RESERVADA){
 						cout << "Esta acomodacao esta reservada, portanto nao pode ser descadastrada!" << endl;
-					}*/
+					}
 					else if (resultado == NAO_ANFITRIAO){
 						cout << "Somente o anfitriao desta acomodacao pode descadastra-la!" << endl;
 					}
+					else if(resultado == FALHA){
+						cout << "Erro no descadastro da acomodacao. Por favor, tente novamente mais tarde." << endl;
+					}
 					
+					break;
+
+				case EXIBIR_ACOMODACAO:
+					resultado = buscarAcomodacao(id);
+					if(resultado == FALHA){
+						cout << "Voce ainda nao possui acomodacoes." << endl;
+					}
 					break;
 
 				case RESERVAR_ACOMODACAO:           
@@ -614,9 +627,30 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 					}
 					
 					break;
+				case EXIBIR_RESERVA:
+					resultado = buscarReserva(id);
+					break;
 
 				case CANCELAR_RESERVA:              
 					resultado = cancelar (id);
+					if (resultado == SUCESSO){
+						cout << "Reserva cancelada com sucesso." << endl;
+					}
+					else if (resultado == RESERVA_NAO_PODE_SER_CANCELADA){
+						cout << "Voce nao pode cancelar uma reserva durante o periodo de reserva" << endl;
+					}
+					else if (resultado == NAO_EXISTE_RESERVAS){
+						cout << "Voce nao possui nenhuma reserva." << endl;
+					}
+					else if(resultado == ACOMODACAO_NAO_ENCONTRADA){
+						cout << "Nao encontramos nenhuma acomodacao reservada com esse identificador" << endl;
+					}
+					else if (resultado == RESERVA_NAO_ENCONTRADA){
+						cout << "Nao encontramos nenhuma reserva com as datas informadas." << endl;
+					}
+					else if (resultado == FALHA){
+						cout << "Erro ao cancelar reserva" << endl;
+					}
 					
 					break;
 
@@ -643,7 +677,15 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 
 				case DESCADASTRAR_DISPONIBILIDADE:  
 					resultado = descadastrarDisp(id);
-					
+					if (resultado == SUCESSO){
+						cout << "Periodo de disponibilidade removido com sucesso." << endl;	
+					}
+					else if (resultado == ACOMODACAO_NAO_PERTECE_USUARIO){
+						cout << "Voce nao possui essa acomodacao." << endl;
+					}
+					else if (resultado == FALHA){
+						cout << "Falha ao tentar descadastrar disponibilidaede" << endl;
+					}
 					break;
 			}
 
@@ -708,8 +750,36 @@ int CntrAprAcomodacao :: cadastrar(Identificador *id) throw(runtime_error) {
 
 }
 
+int CntrAprAcomodacao :: buscarAcomodacao (Identificador *id) throw (runtime_error){
+	int resultado;
+	list<Acomodacao> listaAcomodacao;
+	list<Acomodacao> :: iterator it;
+
+	listaAcomodacao = servidor->buscarAcomodacao(id);
+
+	for(it = listaAcomodacao.begin(); it != listaAcomodacao.end(); ++it){
+		cout << "--------------------------------------" << endl;
+		cout << "Identificador: " << it->getIdentificadorAcomodacao().getIdentificador() << endl;
+		cout << "Tipo de acomodacao: " << it->getTipoAcomodacao().getTipoDeAcomodacao() << endl;
+		cout << "Capacidade: " << it->getCapacidadeAcomodacao().getCapacidade() << endl;
+		cout << "Cidade: " << it->getNomeCidadeAcomodacao().getNome() << endl;
+		cout << "Estado: " << it->getEstadoAcomodacao().getEstado() << endl;
+		cout << "Diaria: R$ " << it->getDiariaAcomodacao().getDiaria() << endl;
+		cout << "--------------------------------------" << endl;
+	}
+	if(listaAcomodacao.empty()){
+		resultado = FALHA;
+	}
+	else{
+		resultado = SUCESSO;
+	}
+	
+	listaAcomodacao.clear();
+	return resultado;
+}
+
 int CntrAprAcomodacao :: descadastrar(Identificador *id) throw(runtime_error){
-    Identificador *idAcomodacao = new Identificador();
+     Identificador *idAcomodacao = new Identificador();
 
     //OBS: Somente o anfitriao pode descadastrar a acomodacao.
     //     Uma acomodacao nao pode ser descadastrada se estiver reservada.
@@ -772,12 +842,37 @@ int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
     delete idAcomodacao;
 
     return resultado;
+}
 
+int CntrAprAcomodacao :: buscarReserva(Identificador *id) throw (runtime_error){
+	int resultado;
+	list<Reserva> listaReserva;
+	list<Reserva> :: iterator it;
+
+	listaReserva = servidor->buscarReserva(id);
+
+	for(it = listaReserva.begin(); it != listaReserva.end(); ++it){
+		cout << "-----------------------------------------------------------" << endl;
+		cout << "Identificador da acomodacao reservada: " << it->getIdentificadorAcomodacaoReserva().getIdentificador() << endl;
+		cout << "Data de inicio da reserva: " << it->getDataInicioReserva().getData() << endl;
+		cout << "Data de termino da reserva: " << it->getDataTerminoReserva().getData() << endl;
+		cout << "-----------------------------------------------------------" << endl;
+	}
+
+	if(listaReserva.empty()){
+		resultado = FALHA;
+	}
+	else{
+		resultado = SUCESSO;
+	}
+
+	return resultado;
 }
 
 int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
     Data *dataInicio = new Data();
     Data *dataTermino = new Data();
+	Data *dataAtual = new Data();
     Identificador *idAcomodacao = new Identificador();
 
     // OBS: Uma reserva pode ser cancelada, desde que a data de cancelamento anteceda o período da reserva.
@@ -791,6 +886,9 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 		cout << "Digite a ID da acomodacao que esta reserva e você deseja cancelar a reserva: " << endl; //pedro
 		getline(cin, entrada);
 		idAcomodacao->setIdentificador(entrada);
+		cout << "Digite a data do dia de hoje (DD/MMM/AAAA): " << endl;
+		getline(cin, entrada);
+		dataAtual->setData(entrada);
 		cout << "Digite a data de inicio da reserva (DD/MMM/AAAA): " << endl;
 		getline(cin, entrada);
 		dataInicio->setData(entrada);
@@ -798,7 +896,7 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 		getline(cin, entrada);
 		dataTermino->setData(entrada);
     	
-		resultado = servidor->cancelar(id, idAcomodacao, dataInicio, dataTermino);
+		resultado = servidor->cancelar(id, idAcomodacao, dataInicio, dataTermino, dataAtual);
 	}
 	catch (const invalid_argument &exp) {
 		cout << endl << "Formato invalido! Tente novamente." << endl;
@@ -808,6 +906,7 @@ int CntrAprAcomodacao :: cancelar(Identificador *id) throw(runtime_error){
 
     delete dataInicio;
     delete dataTermino;
+	delete dataAtual;
     delete idAcomodacao;
     
     return resultado;
@@ -848,8 +947,6 @@ int CntrAprAcomodacao :: cadastrarDisp(Identificador *id) throw(runtime_error){
     delete idAcomodacao;
 
     return resultado;
-
-
 }
 
 int CntrAprAcomodacao :: descadastrarDisp(Identificador *id) throw(runtime_error){
@@ -859,8 +956,6 @@ int CntrAprAcomodacao :: descadastrarDisp(Identificador *id) throw(runtime_error
 
     string entrada;
     int resultado;
-
-    
 
 	cout << endl << "Descadastramento de Disponibilidade." << endl << endl;
 
