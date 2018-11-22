@@ -710,6 +710,14 @@ bool ComandoVerificaAcomodacaoPertenceUsuario :: getResultado() throw (EErroPers
 }
 
 //---------------------------------------------------------------------------
+//Classe ComandoDescadastrarAcomodacao.
+
+ComandoDescadastrarAcomodacao :: ComandoDescadastrarAcomodacao(Identificador idAcomodacao) {
+        containerAcomodacao = "DELETE FROM Acomodacoes WHERE Identificador = ";
+        containerAcomodacao += '\'' + idAcomodacao.getIdentificador() + '\'';
+}
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarDisponibilidade
 
 ComandoCadastrarDisponibilidade :: ComandoCadastrarDisponibilidade (Identificador idAcomodacao, Disponibilidade disponibilidade){
@@ -1275,7 +1283,32 @@ list<Acomodacao> CntrServAcomodacao :: buscarAcomodacao (Identificador *id){
 	return listaAcomodacao;
 }
 
-int CntrServAcomodacao :: descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade){
+int CntrServAcomodacao :: descadastrar (Identificador *id, Identificador *idAcomodacao){
+	int resultado;
+	int IDAcomodacao_recuperado;
+
+	ComandoVerificaAcomodacaoPertenceUsuario comandoAcomodacao(*id , *idAcomodacao);
+	ComandoDescadastrarAcomodacao comando(*idAcomodacao);
+	
+	try{
+		comandoAcomodacao.executar();
+		IDAcomodacao_recuperado = comandoAcomodacao.getResultado();
+		if(IDAcomodacao_recuperado == true){
+			comando.executar();
+			resultado = SUCESSO;
+		}
+
+		else if (IDAcomodacao_recuperado == false) {
+			resultado = NAO_ANFITRIAO;
+		}	
+	}
+
+	catch (EErroPersistencia) {
+		resultado = FALHA;
+	}
+
+	cout << "Resultado: " << resultado << endl;
+	return resultado;
 }
 
 int CntrServAcomodacao :: reservar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino){

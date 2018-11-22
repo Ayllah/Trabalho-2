@@ -766,11 +766,7 @@ int CntrAprAcomodacao :: buscarAcomodacao (Identificador *id) throw (runtime_err
 }
 
 int CntrAprAcomodacao :: descadastrar(Identificador *id) throw(runtime_error){
-    TipoDeAcomodacao *tipo = new TipoDeAcomodacao();
-    CapacidadeDeAcomodacao *capacidade =  new CapacidadeDeAcomodacao();
-    Diaria *preco = new Diaria();
-    Estado *estado = new Estado();
-    Nome *cidade = new Nome();
+     Identificador *idAcomodacao = new Identificador();
 
     //OBS: Somente o anfitriao pode descadastrar a acomodacao.
     //     Uma acomodacao nao pode ser descadastrada se estiver reservada.
@@ -781,37 +777,18 @@ int CntrAprAcomodacao :: descadastrar(Identificador *id) throw(runtime_error){
 	cout << endl << "Descadastro de Acomodacao." << endl << endl;
 
 	try{
-		cout << "Digite seu ID: " << endl;
+		cout << "Digite o ID da acomodacao: " << endl;
 		getline(cin, entrada);
-		id->setIdentificador(entrada);
-		cout << "Digite o tipo de acomodacao (flat, apartamento ou casa): " << endl;
-		getline(cin, entrada);
-		tipo->setTipoDeAcomodacao(entrada);
-		cout << "Digite a capacidade de acomodacao (1 a 9): " << endl;
-		getline(cin, entrada);
-		capacidade->setCapacidade(stoi(entrada));
-		cout << "Digite o valor da diaria: (R$ 1,00 a R$ 10.000,00)" << endl;
-		getline(cin, entrada);
-		preco->setDiaria(stof(entrada));
-		cout << "Digite o Estado onde se encontra a acomodacao (sigla): " << endl;
-		getline(cin, entrada);
-		estado->setEstado(entrada);
-		cout << "Digite a cidade onde se encontra a acomodacao: " << endl;
-		getline(cin, entrada);
-		cidade->setNome(entrada);
+		idAcomodacao->setIdentificador(entrada);
 		
-		resultado = servidor->descadastrar(id, tipo, capacidade, preco, estado, cidade);
+		resultado = servidor->descadastrar(id, idAcomodacao);
 	}
 	catch (const invalid_argument &exp) {
 		cout << endl << "Formato invalido! Tente novamente." << endl;
 		resultado = FALHA;
 	}
     
-    delete tipo;
-    delete capacidade;
-    delete preco;
-    delete estado;
-    delete cidade;
+    delete idAcomodacao;
 
     return resultado;
 
@@ -852,7 +829,6 @@ int CntrAprAcomodacao :: reservar(Identificador *id) throw(runtime_error){
     delete idAcomodacao;
 
     return resultado;
-
 }
 
 int CntrAprAcomodacao :: buscarReserva(Identificador *id) throw (runtime_error){
@@ -868,7 +844,6 @@ int CntrAprAcomodacao :: buscarReserva(Identificador *id) throw (runtime_error){
 		cout << "Data de inicio da reserva: " << it->getDataInicioReserva().getData() << endl;
 		cout << "Data de termino da reserva: " << it->getDataTerminoReserva().getData() << endl;
 		cout << "-----------------------------------------------------------" << endl;
-
 	}
 
 	if(listaReserva.empty()){
@@ -959,8 +934,6 @@ int CntrAprAcomodacao :: cadastrarDisp(Identificador *id) throw(runtime_error){
     delete idAcomodacao;
 
     return resultado;
-
-
 }
 
 int CntrAprAcomodacao :: descadastrarDisp(Identificador *id) throw(runtime_error){
@@ -970,8 +943,6 @@ int CntrAprAcomodacao :: descadastrarDisp(Identificador *id) throw(runtime_error
 
     string entrada;
     int resultado;
-
-    
 
 	cout << endl << "Descadastramento de Disponibilidade." << endl << endl;
 

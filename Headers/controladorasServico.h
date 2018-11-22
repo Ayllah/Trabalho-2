@@ -298,6 +298,14 @@ class ComandoVerificaAcomodacaoPertenceUsuario : public ContainerAcomodacao {
 };
 
 //---------------------------------------------------------------------------
+//Classe ComandoDescadastrarAcomodacao.
+
+class ComandoDescadastrarAcomodacao : public ContainerAcomodacao {
+	public:
+		ComandoDescadastrarAcomodacao (Identificador);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarDisponibilidade
 
 class ComandoCadastrarDisponibilidade : public ContainerDisponibilidade {
@@ -415,13 +423,14 @@ private:
 	const static int ACOMODACAO_NAO_PERTECE_USUARIO = 5;
 	const static int ID_ACOMODACAO_JA_UTILIZADO = 4;
 	const static int CONTA_CORRENTE_AUSENTE = 3;
+	const static int NAO_ANFITRIAO = 2;
 
 public:
 
 	int cadastrar(Identificador *id, Identificador *idAcomodacao, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
 	list<Acomodacao> consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado);
 	list<Acomodacao> buscarAcomodacao(Identificador *id);
-	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
+	int descadastrar(Identificador *id, Identificador *idAcomodacao);
 	int reservar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
 	list<Reserva> buscarReserva(Identificador *id);
 	int cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino, Data *dataAtual);

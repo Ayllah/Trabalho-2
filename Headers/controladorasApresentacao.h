@@ -118,7 +118,8 @@ private:
 	const static int ACOMODACAO_NAO_PERTECE_USUARIO = 5;
 	const static int ID_ACOMODACAO_JA_UTILIZADO = 4;
 	const static int CONTA_CORRENTE_AUSENTE = 3;
-
+	const static int NAO_ANFITRIAO = 2;
+	
 	IServAcomodacao *servidor;
 
     int cadastrar(Identificador *id) throw(runtime_error);
