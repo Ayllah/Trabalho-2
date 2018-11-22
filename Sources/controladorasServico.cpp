@@ -1237,12 +1237,16 @@ int CntrServAcomodacao :: cadastrar(Identificador *id, Identificador *idAcomodac
 }
 
 list<Acomodacao> CntrServAcomodacao :: consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado){
+	bool houveDisponibilidade;
 	list<Acomodacao> listaAcomodacao;
 	list<Acomodacao> :: iterator it;
-	list<Acomodacao> :: iterator it_auxiliar;
+	list<Disponibilidade> listaDisponibilidade;
+	list<Disponibilidade> :: iterator it_disponibilidade;
+
 	Acomodacao acomodacao_recuperada;
 	Identificador id_usu;
-
+	Data dataInicioDisponibilidade;
+	Data dataTerminoDisponibilidade;
 	
 	ComandoPesquisaAcomodacao comandoPesquisar (*id, *dataInicio, *dataTermino, *capacidade, *cidade, *estado);
 	try{
@@ -1254,12 +1258,42 @@ list<Acomodacao> CntrServAcomodacao :: consultar(Identificador *id, Data *dataIn
 	catch (EErroPersistencia){
 
 	}
-
+	
 	for(it = listaAcomodacao.begin(); it != listaAcomodacao.end(); ++it){
 		 cout << it->getIdentificadorAcomodacao().getIdentificador() << endl;
 		 cout << it->getTipoAcomodacao().getTipoDeAcomodacao() << endl;
 		 cout << it->getCapacidadeAcomodacao().getCapacidade() << endl;
 		 cout << it->getDiariaAcomodacao().getDiaria() << endl << endl;	
+		
+		ComandoPesquisarDisponibilidade comandoPesquisarDisponibilidade (it->getIdentificadorAcomodacao());
+		try{
+			comandoPesquisarDisponibilidade.executar();
+			listaDisponibilidade = comandoPesquisarDisponibilidade.getResultado();
+		}
+		catch (EErroPersistencia){
+
+		}
+
+		houveDisponibilidade = false;
+
+		for(it_disponibilidade = listaDisponibilidade.begin(); it_disponibilidade != listaDisponibilidade.end(); ++it_disponibilidade){
+			dataInicioDisponibilidade = it_disponibilidade->getDataInicioDisponibilidade();
+			dataTerminoDisponibilidade = it_disponibilidade->getDataTerminoDisponibilidade();
+
+			cout << dataInicioDisponibilidade.getData() << ' ' << dataTerminoDisponibilidade.getData() << endl;
+			
+			if(((Data :: comparaDatas (*dataInicio, dataInicioDisponibilidade) == -1) &&
+			     (Data :: comparaDatas (*dataTermino, dataTerminoDisponibilidade) == 1))){
+				houveDisponibilidade = true;
+				cout << "Acomodacao disponivel no intervalo de busca" << endl;
+			}
+		}
+
+		if (houveDisponibilidade == false){
+			cout << "Pode remover essa acomodacao da listta" << endl;
+		}
+
+		listaDisponibilidade.clear();
 	}
 
 	return listaAcomodacao;
@@ -1289,7 +1323,7 @@ int CntrServAcomodacao :: descadastrar (Identificador *id, Identificador *idAcom
 
 	ComandoVerificaAcomodacaoPertenceUsuario comandoAcomodacao(*id , *idAcomodacao);
 	ComandoDescadastrarAcomodacao comando(*idAcomodacao);
-	
+
 	try{
 		comandoAcomodacao.executar();
 		IDAcomodacao_recuperado = comandoAcomodacao.getResultado();
