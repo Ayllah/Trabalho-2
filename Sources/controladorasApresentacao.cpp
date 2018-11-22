@@ -582,15 +582,18 @@ int CntrAprAcomodacao :: executar(Identificador *id) {
 
 				case DESCADASTRAR_ACOMODACAO:       
 					resultado = descadastrar(id);
-					
+
 					if(resultado == SUCESSO){
 						cout << "Acomodacao descadastrada com sucesso!" << endl;
 					}
-					/*else if (resultado == ACOMODACAO_RESERVADA){
+					else if (resultado == AINDA_RESERVADA){
 						cout << "Esta acomodacao esta reservada, portanto nao pode ser descadastrada!" << endl;
-					}*/
+					}
 					else if (resultado == NAO_ANFITRIAO){
 						cout << "Somente o anfitriao desta acomodacao pode descadastra-la!" << endl;
+					}
+					else if(resultado == FALHA){
+						cout << "Erro no descadastro da acomodacao. Por favor, tente novamente mais tarde." << endl;
 					}
 					
 					break;
