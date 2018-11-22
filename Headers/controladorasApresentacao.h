@@ -59,6 +59,8 @@ private:
 	const static char SIM = 'S';
 	const static char NAO = 'N';
 
+	const static int USUARIO_POSSUI_RESERVA = 6;
+	const static int USUARIO_POSSUI_ACOMODACAO = 5;
 	const static int ACOMODACAO_AINDA_CADASTRADA = 4;
 	const static int CARTAO_DE_CREDITO_JA_CADASTRADO = 3;
 	const static int CONTA_CORRENTE_JA_CADASTRADA = 2;
@@ -66,20 +68,18 @@ private:
 	const static int SUCESSO = 0;
 	const static int FALHA = -1;
 	const static int DESISTENCIA = -2;
+	const static int DESCADASTRADO = -3;
 
 	int menuMinhaConta(Identificador *id) throw(runtime_error);
 	int menuContaCorrente(Identificador *id) throw(runtime_error);
 	int menuCartaoDeCredito(Identificador *id) throw(runtime_error);
 
-	//int editarUsuario(Identificador *id) throw(runtime_error);
 	int descadastrarUsuario(Identificador *id) throw(runtime_error);
 
 	int cadastrarContaCorrente(Identificador *id) throw(runtime_error);
-	//int editarContaCorrent(Identificador *id) throw(runtime_error);
 	int descadastrarContaCorrente(Identificador *id) throw(runtime_error);
 	
 	int cadastrarCartaoDeCredito(Identificador *id) throw(runtime_error);
-	//int editarCartaoCredito(Identificador *id) throw(runtime_error);
 	int descadastrarCartaoDeCredito(Identificador *id) throw(runtime_error);
 
 public:
@@ -95,13 +95,19 @@ class CntrAprAcomodacao : public IAprAcomodacao {
 private:
 
 	const static int CADASTRAR_ACOMODACAO   = 1;
-    const static int DESCADASTRAR_ACOMODACAO   = 2;
-    const static int RESERVAR_ACOMODACAO = 3;
-    const static int CANCELAR_RESERVA    = 4;
-    const static int CADASTRAR_DISPONIBILIDADE = 5;
-    const static int DESCADASTRAR_DISPONIBILIDADE = 6;
+	const static int EXIBIR_ACOMODACAO = 2;
+    const static int DESCADASTRAR_ACOMODACAO   = 3;
+    const static int RESERVAR_ACOMODACAO = 4;
+	const static int EXIBIR_RESERVA = 5;
+    const static int CANCELAR_RESERVA = 6;
+    const static int CADASTRAR_DISPONIBILIDADE = 7;
+	const static int EXIBIR_DISPONIBILIDADE = 8;
+    const static int DESCADASTRAR_DISPONIBILIDADE = 9;
     const static int RETORNAR = 0;
 
+	const static int RESERVA_NAO_ENCONTRADA = 15;
+	const static int NAO_EXISTE_RESERVAS = 14;
+	const static int RESERVA_NAO_PODE_SER_CANCELADA = 13;
 	const static int DISPONIBILIDADE_NAO_DISPONIVEL = 12;
 	const static int ACOMODACAO_NAO_ENCONTRADA = 11;
 	const static int ACOMODACAO_INDISPONIVEL_NO_PERIODO = 10;
@@ -116,9 +122,11 @@ private:
 	IServAcomodacao *servidor;
 
     int cadastrar(Identificador *id) throw(runtime_error);
+	int buscarAcomodacao(Identificador *id) throw (runtime_error);
     int descadastrar(Identificador *id) throw(runtime_error);
     int reservar(Identificador *id) throw(runtime_error);
-    int cancelar(Identificador *id) throw(runtime_error);
+    int buscarReserva(Identificador *id) throw (runtime_error);
+	int cancelar(Identificador *id) throw(runtime_error);
     int cadastrarDisp(Identificador *id) throw(runtime_error);
     int descadastrarDisp(Identificador *id) throw(runtime_error);
 

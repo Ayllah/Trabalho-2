@@ -361,10 +361,20 @@ public:
 
 class Reserva{
 private:
+    Identificador identificadorUsuario;
+    Identificador identificadorAcomodacao;
     Data dataInicioReserva;
     Data dataTerminoReserva;
 
 public:
+    void setIdentificadorAcomodacaoReserva(Identificador identificadorAcomodacao){
+        this->identificadorAcomodacao = identificadorAcomodacao;
+    }
+
+    Identificador getIdentificadorAcomodacaoReserva() const{
+        return identificadorAcomodacao;
+    }
+    
     /**
      *@brief Seta o objeto Data da classe Reserva.
      *@param dataInicioReserva é a data fornecida pelo usuário.

@@ -179,6 +179,14 @@ class ComandoPesquisarUsuario : public ContainerUsuario {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoRemoverUsuario
+
+class ComandoRemoverUsuario : public ContainerUsuario {
+	public:
+		ComandoRemoverUsuario (Identificador);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarContaCorrente.
 
 class ComandoCadastrarContaCorrente : public ContainerUsuario {
@@ -256,6 +264,14 @@ class ComandoPesquisaIDAcomodacao : public ContainerAcomodacao {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisaProprietarioAcomodacao
+class ComandoPesquisaProprietarioAcomodacao : public ContainerAcomodacao{
+	public:
+		ComandoPesquisaProprietarioAcomodacao(Identificador);
+		string getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
 // Classe ComandoPesquisaAcomodacao
 
 class ComandoPesquisaAcomodacao : public ContainerAcomodacao{
@@ -264,14 +280,6 @@ class ComandoPesquisaAcomodacao : public ContainerAcomodacao{
 		list<Acomodacao> getResultado() throw (EErroPersistencia);
 };
 
-//---------------------------------------------------------------------------
-// Classe ComandoPesquisaAcomodacoesDoUsuario
-
-class ComandoPesquisaAcomodacoesDoUsuario : public ContainerAcomodacao {
-	public:
-		ComandoPesquisaAcomodacoesDoUsuario(Identificador);
-		list<Acomodacao> getResultado() throw (EErroPersistencia);
-};
 
 //---------------------------------------------------------------------------
 class ComandoProcuraAcomodacao : public ContainerAcomodacao{
@@ -341,6 +349,21 @@ class ComandoPesquisaReserva : public ContainerReserva {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoPesquisaReservaUsuario
+class ComandoPesquisaReservaUsuario : public ContainerReserva {
+	public:
+		ComandoPesquisaReservaUsuario (Identificador);
+		list<Reserva> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoDescadastraReserva
+class ComandoDescadastraReserva : public ContainerReserva {
+	public:
+		ComandoDescadastraReserva (Identificador, Identificador, Data, Data);
+};
+
+//---------------------------------------------------------------------------
 // Classe Controladora Autenticacao
 
 class CntrServAutenticacao : public IServAutenticacao {
@@ -358,6 +381,8 @@ public:
 
 class CntrServUsuario : public IServUsuario {
 private:
+	const static int USUARIO_POSSUI_RESERVA = 6;
+	const static int USUARIO_POSSUI_ACOMODACAO = 5;
 	const static int ACOMODACAO_AINDA_CADASTRADA = 4;
 	const static int CARTAO_DE_CREDITO_JA_CADASTRADO = 3;
 	const static int CONTA_CORRENTE_JA_CADASTRADA = 2;
@@ -377,6 +402,9 @@ public:
 
 class CntrServAcomodacao : public IServAcomodacao {
 private:
+	const static int RESERVA_NAO_ENCONTRADA = 15;
+	const static int NAO_EXISTE_RESERVAS = 14;
+	const static int RESERVA_NAO_PODE_SER_CANCELADA = 13;
 	const static int DISPONIBILIDADE_NAO_DISPONIVEL = 12;
 	const static int ACOMODACAO_NAO_ENCONTRADA = 11;
 	const static int ACOMODACAO_INDISPONIVEL_NO_PERIODO = 10;
@@ -391,10 +419,12 @@ private:
 public:
 
 	int cadastrar(Identificador *id, Identificador *idAcomodacao, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
-	int consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado);
+	list<Acomodacao> consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado);
+	list<Acomodacao> buscarAcomodacao(Identificador *id);
 	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
 	int reservar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
-	int cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
+	list<Reserva> buscarReserva(Identificador *id);
+	int cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino, Data *dataAtual);
 	int cadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
 	int descadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
 
