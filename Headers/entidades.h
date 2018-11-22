@@ -194,7 +194,7 @@ public:
      *@param cidadeAcomodacao é o nome fornecido pelo usuário.
      */
 
-    void setNomeAcomodacao(Nome cidadeAcomodacao){
+    void setNomeCidadeAcomodacao(Nome cidadeAcomodacao){
         this->cidadeAcomodacao = cidadeAcomodacao;
     }
 
@@ -203,7 +203,7 @@ public:
      *@return Nome cidadeAcomodacao (objeto da classe).
      */
 
-    Nome getNomeAcomodacao() const {
+    Nome getNomeCidadeAcomodacao() const {
         return cidadeAcomodacao;
     }
 
@@ -357,6 +357,95 @@ public:
     Banco getBancoContaCorrente() const {
         return bancoContaCorrente;
     }
+};
+
+class Reserva{
+private:
+    Data dataInicioReserva;
+    Data dataTerminoReserva;
+
+public:
+    /**
+     *@brief Seta o objeto Data da classe Reserva.
+     *@param dataInicioReserva é a data fornecida pelo usuário.
+     */
+
+    void setDataInicioReserva(Data dataInicioReserva){
+        this->dataInicioReserva = dataInicioReserva;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Reserva.
+     *@return Data dataInicioReserva (objeto da classe).
+     */
+
+    Data getDataInicioReserva() const {
+        return dataInicioReserva;
+    }
+
+    /**
+     *@brief Seta o objeto Data da classe Reserva.
+     *@param dataTerminoReserva é a data pelo usuário.
+     */
+
+    void setDataTerminoReserva(Data dataTerminoReserva){
+        this->dataTerminoReserva = dataTerminoReserva;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Reserva.
+     *@return Data dataTerminoReserva (objeto da classe).
+     */
+
+    Data getDataTerminoReserva() const {
+        return dataTerminoReserva;
+    }
+
+};
+
+class Disponibilidade{
+private:
+    Data dataInicioDisponibilidade;
+    Data dataTerminoDisponibilidade;
+
+public:
+    /**
+     *@brief Seta o objeto Data da classe Disponibilidade.
+     *@param dataInicioDisponibilidade é a data fornecida pelo usuário.
+     */
+
+    void setDataInicioDisponibilidade(Data dataInicioDisponibilidade){
+        this->dataInicioDisponibilidade = dataInicioDisponibilidade;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Disponibilidade.
+     *@return Data dataInicioDisponibilidade (objeto da classe).
+     */
+
+    Data getDataInicioDisponibilidade() const {
+        return dataInicioDisponibilidade;
+    }
+
+    /**
+     *@brief Seta o objeto Data da classe Disponibilidade.
+     *@param dataTerminoDisponibilidade é a data pelo usuário.
+     */
+
+    void setDataTerminoDisponibilidade(Data dataTerminoDisponibilidade){
+        this->dataTerminoDisponibilidade = dataTerminoDisponibilidade;
+    }
+
+    /**
+     *@brief Retorna a data do objeto da classe Disponibilidade.
+     *@return Data dataTerminoDisponibilidade (objeto da classe).
+     */
+
+    Data getDataTerminoDisponibilidade() const {
+        return dataTerminoDisponibilidade;
+    }
+
+    bool comparaDisponibilidade(Disponibilidade, Disponibilidade) const;
 };
 
 #endif // ENTIDADES_H_INCLUDED

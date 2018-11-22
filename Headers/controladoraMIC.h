@@ -22,6 +22,7 @@ class CntrMIC{
         const static int ENTRAR = 1;
         const static int CADASTRAR = 2;
         const static int SAIR = 0;
+        
         const static int SUCESSO = 0;
 
         void inicializar();

@@ -21,9 +21,11 @@ void CntrMIC :: entrar(){
     resultado = cntrAutenticar->autenticar(id);
 
     if(resultado == SUCESSO){
+        cout << "Autenticado com sucesso" << endl;
         cntrUsuario->executar(id);
     }
     else{
+        cout << "Falha na autenticao. Identificador ou senha incorreta. Por favor, tent novamente." << endl;
         return;
     }
 
@@ -49,19 +51,21 @@ void CntrMIC :: menu(){
 		cout << CADASTRAR << " - Cadastrar" << endl;
 		cout << SAIR << " - Sair" << endl;
 		getline(cin, opcao);
-        // Problemas com entrada inváldia do usuario. Tipo, digitar uma letra junto com o número
-		switch(stoi(opcao)){
-			case ENTRAR:
-				entrar();
-				break;
+        
+        if(opcao.size() != 0){
+            switch(stoi(opcao)){
+                case ENTRAR:
+                    entrar();
+                    break;
 
-			case CADASTRAR:
-				cadastrar();
-				break;
-		}
+                case CADASTRAR:
+                    cadastrar();
+                    break;
+            }
 
-		if(stoi(opcao) == SAIR){
-			break;
-		}
+            if(stoi(opcao) == SAIR){
+                break;
+            }
+        }
 	}
 }

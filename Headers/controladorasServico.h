@@ -24,7 +24,6 @@ public:
         string what();
 };
 
-//---------------------------------------------------------------------------
 //classe ElementoResultado
 
 class ElementoResultado {
@@ -43,7 +42,7 @@ public:
 };
 
 //---------------------------------------------------------------------------
-//classe ContainerUsuario
+// Classe ContainerUsuario
 
 class ContainerUsuario {
 private:
@@ -68,28 +67,91 @@ public:
 };
 
 //---------------------------------------------------------------------------
-//classe ContainerAcomodacao
+// Classe ContainerAcomodacao
 
-class ContainerAcomodacao{
-private:
-	const char *nomeBancoDados;
-    sqlite3 *bd;
-    char *mensagem;
-    int rc;
-    void conectar() throw (EErroPersistencia);
-    void desconectar() throw (EErroPersistencia);
-    static int callback(void *, int, char **, char **);
-
-protected:
-        static list<ElementoResultado> listaResultadoAcomodacao;
-        string ContainerAcomodacao;
-public:
-	ContainerAcomodacao() {
-		//Informa o nome do banco de dados.
-             nomeBancoDados = "BaseDeDados";
-	}
+class ContainerAcomodacao {
+	private: 
+		const char *nomeBancoDados;
+		sqlite3 *bd;
+		char *mensagem;
+		int rc;
+		void conectar() throw (EErroPersistencia);
+		void desconectar() throw (EErroPersistencia);
+	    static int callback(void *, int, char **, char **);
 	
-	void executar() throw (EErroPersistencia);
+	protected:
+		static list<ElementoResultado> listaResultado;
+        string containerAcomodacao;
+
+	public:
+		ContainerAcomodacao() {
+			//Informa o nome do banco de dados.
+				nomeBancoDados = "BaseDeDados";
+		}
+		
+		void executar() throw (EErroPersistencia);
+
+};
+
+//---------------------------------------------------------------------------
+// Classe ContainerDisponibilidade
+
+class ContainerDisponibilidade {
+	private: 
+		const char *nomeBancoDados;
+		sqlite3 *bd;
+		char *mensagem;
+		int rc;
+		void conectar() throw (EErroPersistencia);
+		void desconectar() throw (EErroPersistencia);
+	    static int callback(void *, int, char **, char **);
+	
+	protected:
+		static list<ElementoResultado> listaResultado;
+        string containerDisponibilidade;
+
+	public:
+		ContainerDisponibilidade() {
+			//Informa o nome do banco de dados.
+				nomeBancoDados = "BaseDeDados";
+		}
+		
+		void executar() throw (EErroPersistencia);
+
+};
+
+//---------------------------------------------------------------------------
+// Classe ContainerReserva
+
+class ContainerReserva {
+	private: 
+		const char *nomeBancoDados;
+		sqlite3 *bd;
+		char *mensagem;
+		int rc;
+		void conectar() throw (EErroPersistencia);
+		void desconectar() throw (EErroPersistencia);
+	    static int callback(void *, int, char **, char **);
+	
+	protected:
+		static list<ElementoResultado> listaResultado;
+        string containerReserva;
+
+	public:
+		ContainerReserva() {
+			//Informa o nome do banco de dados.
+				nomeBancoDados = "BaseDeDados";
+		}
+		
+		void executar() throw (EErroPersistencia);
+
+};
+
+//---------------------------------------------------------------------------
+// Classe Ordenacao
+class Ordenacao {
+	public:
+		static bool comparacao(Disponibilidade, Disponibilidade);
 };
 
 //---------------------------------------------------------------------------
@@ -100,6 +162,7 @@ class ComandoLerSenha : public ContainerUsuario {
 		string getResultado() throw (EErroPersistencia);
 };
 
+//---------------------------------------------------------------------------
 //Classe ComandoCadastrarUsuario.
 
 class ComandoCadastrarUsuario : public ContainerUsuario {
@@ -134,6 +197,15 @@ class ComandoPesquisarContaCorrente : public ContainerUsuario {
 };
 
 //---------------------------------------------------------------------------
+// Classe ComandoDescadastrarContaCorrente.
+
+class ComandoDescadastrarContaCorrente : public ContainerUsuario {
+	public:
+		ComandoDescadastrarContaCorrente(Identificador);
+};
+
+
+//---------------------------------------------------------------------------
 // Classe ComandoCadastrarCartaoDeCredito.
 
 class ComandoCadastrarCartaoDeCredito : public ContainerUsuario {
@@ -151,20 +223,140 @@ class ComandoPesquisarCartaoDeCredito : public ContainerUsuario {
 };
 
 //---------------------------------------------------------------------------
-// Classe ComandoCadastrarAcomodacao.
+// Classe ComandoDescadastrarCartaoDeCredito.
 
-class ComandoCadastrarAcomodacao : public ContainerAcomodacao{
+class ComandoDescadastrarCartaoDeCredito : public ContainerUsuario {
+	public:
+		ComandoDescadastrarCartaoDeCredito(Identificador);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarAcomodacao
+
+class ComandoCadastrarAcomodacao : public ContainerAcomodacao {
 	public:
 		ComandoCadastrarAcomodacao(Identificador, Acomodacao);
 };
 
 //---------------------------------------------------------------------------
-// Classe ComandoPesquisarAcomodacao.
+// Classe ComandoVerificaExclusividadeIdentificadorAcomodacao
 
-class ComandoPesquisarAcomodacao : public ContainerAcomodacao {
+class ComandoVerificaExclusividadeIdentificadorAcomodacao : public ContainerAcomodacao {
 	public:
-		ComandoPesquisarAcomodacao(Identificador);
-		Acomodacao getResultado() throw (EErroPersistencia);
+		ComandoVerificaExclusividadeIdentificadorAcomodacao(Identificador);
+		bool getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisaIDAcomodacao
+
+class ComandoPesquisaIDAcomodacao : public ContainerAcomodacao {
+	public:
+		ComandoPesquisaIDAcomodacao(Identificador);
+		bool getResultado() throw (EErroPersistencia);	
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisaAcomodacao
+
+class ComandoPesquisaAcomodacao : public ContainerAcomodacao{
+	public:
+		ComandoPesquisaAcomodacao(Identificador, Data, Data, CapacidadeDeAcomodacao, Nome, Estado);
+		list<Acomodacao> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisaAcomodacoesDoUsuario
+
+class ComandoPesquisaAcomodacoesDoUsuario : public ContainerAcomodacao {
+	public:
+		ComandoPesquisaAcomodacoesDoUsuario(Identificador);
+		list<Acomodacao> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+class ComandoProcuraAcomodacao : public ContainerAcomodacao{
+	public:
+		ComandoProcuraAcomodacao(Identificador);
+		list<Acomodacao> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoVerificaAcomodacaoPertenceUsuario
+
+class ComandoVerificaAcomodacaoPertenceUsuario : public ContainerAcomodacao {
+	public:
+		ComandoVerificaAcomodacaoPertenceUsuario (Identificador id, Identificador idAcomodacao);
+		bool getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoDescadastrarAcomodacao.
+
+class ComandoDescadastrarAcomodacao : public ContainerAcomodacao {
+	public:
+		ComandoDescadastrarAcomodacao(Identificador);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarDisponibilidade
+
+class ComandoCadastrarDisponibilidade : public ContainerDisponibilidade {
+	public:
+		ComandoCadastrarDisponibilidade (Identificador,Disponibilidade);		
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisarDisponibilidade
+
+class ComandoPesquisarDisponibilidade : public ContainerDisponibilidade {
+	public:
+		ComandoPesquisarDisponibilidade (Identificador);
+		list<Disponibilidade> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoDescadastrarDisponibilidade
+
+class ComandoDescadastrarDisponibilidade : public ContainerDisponibilidade {
+	public:
+		ComandoDescadastrarDisponibilidade (Identificador, Disponibilidade);		
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoDescadastrarTodasDisponibilidadesAcomodacao
+
+class ComandoDescadastrarTodasDisponibilidadesAcomodacao : public ContainerDisponibilidade {
+	public:
+		ComandoDescadastrarTodasDisponibilidadesAcomodacao (Identificador);
+};
+
+
+//---------------------------------------------------------------------------
+// Classe ComandoCadastrarReserva
+
+class ComandoCadastrarReserva : public ContainerReserva {
+	public:
+		ComandoCadastrarReserva (Identificador id, Identificador idAcomodacao, Reserva);
+};
+
+//---------------------------------------------------------------------------
+// Classe ComandoPesquisaReserva
+
+class ComandoPesquisaReserva : public ContainerReserva {
+	public:
+		ComandoPesquisaReserva (Identificador);
+		list<Reserva> getResultado() throw (EErroPersistencia);
+};
+
+//---------------------------------------------------------------------------
+//Classe ComandoProcuraReserva.
+
+class ComandoProcuraReserva : public ContainerReserva{
+	public:
+		ComandoProcuraReserva (Identificador);
+		list<Reserva> getResultado() throw (EErroPersistencia);
+
 };
 
 //---------------------------------------------------------------------------
@@ -179,12 +371,14 @@ public:
 	int autenticar(Identificador* id, Senha* senha);
 };
 
+
 //---------------------------------------------------------------------------
 // Classe Controladora Usuario
 
 class CntrServUsuario : public IServUsuario {
 private:
-
+	const static int RESERVA_AINDA_CADASTRADA = 5;
+	const static int ACOMODACAO_AINDA_CADASTRADA = 4;
 	const static int CARTAO_DE_CREDITO_JA_CADASTRADO = 3;
 	const static int CONTA_CORRENTE_JA_CADASTRADA = 2;
 	const static int USUARIO_JA_CADASTRADO = 1;
@@ -201,23 +395,32 @@ public:
 	int descadastrarCartaoDeCredito(Identificador* id);
 };
 
-//---------------------------------------------------------------------------
-// Classe Controladora Acomodacao
-
 class CntrServAcomodacao : public IServAcomodacao {
 private:
-	const static int ACOMODACAO_JA_CADASTRADA = 1;
-	const static int SUCESSO =  0;
-    const static int FALHA   = -1;
+	const static int DISPONIBILIDADE_NAO_DISPONIVEL = 12;
+	const static int ACOMODACAO_NAO_ENCONTRADA = 11;
+	const static int ACOMODACAO_INDISPONIVEL_NO_PERIODO = 10;
+	const static int ACOMODACAO_INEXISTENTE = 9;
+	const static int ACOMODACAO_NAO_DISPONIVEL = 8;
+	const static int ACOMODACAO_JA_TEM_DISPONIBILIDADE = 7;
+	const static int ACOMODACAO_PERTECE_USUARIO = 6;
+	const static int ACOMODACAO_NAO_PERTECE_USUARIO = 5;
+	const static int ID_ACOMODACAO_JA_UTILIZADO = 4;
+	const static int CONTA_CORRENTE_AUSENTE = 3;
+	const static int NAO_ANFITRIAO = 2;
 
 public:
-	int cadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
-	int consultar(Identificador *id, Data *dataInicio, Data *dataTermino);
-	int descadastrar(Identificador *id, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
-	int reservar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
-	int cancelar(Identificador *id, TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
-	int cadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
-	int descadastrarDisp(TipoDeAcomodacao *tipo, Data *dataInicio, Data *dataTermino);
+
+	int cadastrar(Identificador *id, Identificador *idAcomodacao, TipoDeAcomodacao *tipo, CapacidadeDeAcomodacao *capacidade, Diaria *preco, Estado *estado, Nome *cidade);
+	int consultar(Identificador *id, Data *dataInicio, Data *dataTermino, CapacidadeDeAcomodacao *capacidade, Nome *cidade, Estado* estado);
+	int descadastrar(Identificador *id, Identificador *idAcomodacao);
+	int reservar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
+	int cancelar(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
+	int cadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
+	int descadastrarDisp(Identificador *id, Identificador *idAcomodacao, Data *dataInicio, Data *dataTermino);
+
+	const static int SUCESSO =  0;
+    const static int FALHA   = -1;
 };
 
 

@@ -94,11 +94,11 @@ void Diaria::setDiaria(double preco) throw (invalid_argument){
     this->preco = preco;
 }
 
-int Data::verificaMes(string nomeMes, string *meses){
+int Data::verificaMes(string nomeMes){
     int verificador = INVALIDO;
-    for(int i = 0; i <NUMERO_MESES; ++i){
+    for(int i = 0; i < QUANTIDADE_MESES; ++i){
         if( nomeMes == meses[i]){
-            verificador = ++i;
+            verificador = i + 1;
             break;
         }
     }
@@ -132,28 +132,12 @@ void Data::validar(string data) throw (invalid_argument){
     string mes;
     verificadorTamanho = data.size();
 
-    string meses[NUMERO_MESES] = {"jan", "fev", "mar", "abr",
-                                  "mai", "jun", "jul", "ago",
-                                  "set", "out", "nov", "dez"};
-    int numeroDiasDoMes[NUMERO_MESES] = {31, 29, 31, 30,
-                                         31, 30, 31, 31,
-                                         30, 31, 30, 31};
-
-
     dia = stoi(data, 0);
     memcpy(ano,&data[7],4);
     ano[4] = '\0';
     mes = data.substr(3,3);
 
-    //Converte os caracteres, se do tipo letra, da string nomeMes para caixa baixa
-
-    for(i = 0; mes[i] != '\0'; ++i){
-        if(isalpha(mes[i])){
-            mes[i] = tolower(mes[i]);
-        }
-    }
-
-    verificadorMes = verificaMes(mes, &meses[0]);
+    verificadorMes = verificaMes(mes);
 
     // Lança exceção se o tamanho da string agencia for diferente do tamanho esperado
 
@@ -181,7 +165,6 @@ void Data::validar(string data) throw (invalid_argument){
         throw invalid_argument("Argumento invalido.");
     }
     else{
-
         // Lança exceção se houver caracteres que não são letra na string nomeMes
 
         for(i = 0; mes[i] != '\0'; ++i){
@@ -209,9 +192,277 @@ void Data::validar(string data) throw (invalid_argument){
     }
 }
 
+bool Data :: diaComecoMes() throw (invalid_argument){
+    string dia;
+
+    dia = this->getData().substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    
+    if (stoi(dia) == 1){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool Data :: diaMeioMes() throw (invalid_argument){
+    string dia, mes, ano;
+    int int_mes;
+    int ultimoDiaMes;
+
+    dia = this->getData().substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mes = this->getData().substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mes = this->verificaMes(mes);
+    ano = this->getData().substr(POSICAO_SEPARADOR_MES_ANO + 1, TAMANHO_PADRAO_ANO);
+
+    ultimoDiaMes = numeroDiasDoMes[int_mes - 1];
+
+    if(!this->verificaBissexto(stoi(ano)) && int_mes == 2){
+        ultimoDiaMes -= 1;
+    }
+
+    if(stoi(dia) > 1 && stoi(dia) < ultimoDiaMes){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool Data :: diaFimMes() throw (invalid_argument){
+    string dia, mes, ano;
+    int int_mes;
+    int ultimoDiaMes;
+
+    dia = this->getData().substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mes = this->getData().substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mes = this->verificaMes(mes);
+    ano = this->getData().substr(POSICAO_SEPARADOR_MES_ANO + 1, TAMANHO_PADRAO_ANO);
+
+    ultimoDiaMes = numeroDiasDoMes[int_mes - 1];
+
+    if(!this->verificaBissexto(stoi(ano)) && int_mes == 2){
+        ultimoDiaMes -= 1;
+    }
+
+    if(stoi(dia) == ultimoDiaMes){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool Data :: diaComecoAno() throw (invalid_argument){
+    string dia, mes;
+    int int_mes;
+
+    dia = this->getData().substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mes = this->getData().substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mes = this->verificaMes(mes);
+
+    if(stoi(dia) == 1 && int_mes == 1){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+bool Data :: diaFimAno() throw (invalid_argument){
+    string dia, mes;
+    int int_mes;
+
+    dia = this->getData().substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mes = this->getData().substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mes = this->verificaMes(mes);
+
+    if(stoi(dia) == 31 && int_mes == 12){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 void Data::setData(string data) throw (invalid_argument){
+    string dia, mes, ano;
+
+    dia = data.substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    
+    mes = data.substr(POSICAO_SEPARADOR_DIA_MES + 1,TAMANHO_PADRAO_MES);
+    for(int i = 0; mes[i] != '\0'; ++i){
+        if(isalpha(mes[i])){
+            mes[i] = tolower(mes[i]);
+        }
+    }
+
+    ano = data.substr(POSICAO_SEPARADOR_MES_ANO + 1, TAMANHO_PADRAO_ANO);
+
+    data = dia + '/' + mes + '/' + ano;
+    
     validar(data);
     this->data = data;
+}
+
+Data Data :: getDataAnterior() throw (invalid_argument){
+    Data dataAnterior;
+    string str_dataAtual, str_dataAnterior;
+    string diaDataAtual, mesDataAtual, anoDataAtual;
+    int int_mesDataAtual;
+    string diaDataAnterior, mesDataAnterior, anoDataAnterior;
+    int int_mesDataAnterior;
+    int ultimoDiaMesAtual;
+    int ultimoDiaMesAnterior;
+    str_dataAtual = this->getData();
+
+    diaDataAtual = str_dataAtual.substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mesDataAtual = str_dataAtual.substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mesDataAtual = this->verificaMes(mesDataAtual);
+    anoDataAtual = str_dataAtual.substr(POSICAO_SEPARADOR_MES_ANO + 1, TAMANHO_PADRAO_ANO);
+
+    ultimoDiaMesAtual = numeroDiasDoMes[int_mesDataAtual - 1];
+    ultimoDiaMesAnterior = numeroDiasDoMes[int_mesDataAtual - 2];
+    if(int_mesDataAtual > 1){
+        ultimoDiaMesAnterior = numeroDiasDoMes[int_mesDataAtual - 2];
+    }
+
+    if(!this->verificaBissexto(stoi(anoDataAtual)) && int_mesDataAtual == 2){
+        ultimoDiaMesAtual -= 1;
+    }
+    
+    if(!this->verificaBissexto(stoi(anoDataAtual)) && int_mesDataAnterior == 2){
+        ultimoDiaMesAnterior -= 1;
+    }
+    
+    if (this->diaMeioMes()){
+        if(stoi(diaDataAtual) < 11){ // quando dia anterior está entre 01 e 09
+            diaDataAnterior = '0' + to_string(stoi(diaDataAtual) - 1);
+        }
+        else{
+            diaDataAnterior = to_string(stoi(diaDataAtual) - 1);
+        }
+
+        mesDataAnterior = mesDataAtual;
+        anoDataAnterior = anoDataAtual;
+    }
+    else if (this->diaComecoAno()){
+        diaDataAnterior = to_string(numeroDiasDoMes[11]);
+        mesDataAnterior = meses[11];
+        anoDataAnterior = to_string(stoi(anoDataAtual) - 1);
+    }
+    else if (this->diaFimAno()){
+        diaDataAnterior = to_string(numeroDiasDoMes[11] - 1);
+        mesDataAnterior = mesDataAtual;
+        anoDataAnterior = anoDataAtual;
+    }
+    else if (this->diaComecoMes()){
+        int_mesDataAnterior = int_mesDataAtual - 1;
+        diaDataAnterior = to_string(ultimoDiaMesAnterior);
+        mesDataAnterior = meses[int_mesDataAnterior - 1];
+        anoDataAnterior = anoDataAtual;
+    }
+    else if (this->diaFimMes()){
+        diaDataAnterior = to_string(ultimoDiaMesAtual - 1);
+        mesDataAnterior = mesDataAtual;
+        anoDataAnterior = anoDataAtual;
+    }
+    
+    str_dataAnterior = diaDataAnterior + '/' + mesDataAnterior + '/' + anoDataAnterior;
+    
+    dataAnterior.setData(str_dataAnterior);
+
+    return dataAnterior;
+}
+
+Data Data :: getDataPosterior() throw (invalid_argument){
+    Data dataPosterior;
+    string str_dataAtual, str_dataPosterior;
+    string diaDataAtual, mesDataAtual, anoDataAtual;
+    int int_mesDataAtual;
+    string diaDataPosterior, mesDataPosterior, anoDataPosterior;
+    int int_mesDataPosterior;
+    int ultimoDiaMesAtual;
+    int ultimoDiaMesAnterior;
+    str_dataAtual = this->getData();
+
+    diaDataAtual = str_dataAtual.substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mesDataAtual = str_dataAtual.substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mesDataAtual = this->verificaMes(mesDataAtual);
+    anoDataAtual = str_dataAtual.substr(POSICAO_SEPARADOR_MES_ANO + 1, TAMANHO_PADRAO_ANO);
+
+    if (this->diaMeioMes()){
+        if(stoi(diaDataAtual) < 9){ // quando dia anterior está entre 01 e 09
+            diaDataPosterior = '0' + to_string(stoi(diaDataAtual) + 1);
+        }
+        else{
+            diaDataPosterior = to_string(stoi(diaDataAtual) + 1);
+        }
+    
+        mesDataPosterior = mesDataAtual;
+        anoDataPosterior = anoDataAtual;
+    }
+    else if (this->diaComecoAno()){
+        diaDataPosterior = "02";
+        mesDataPosterior = mesDataAtual;
+        anoDataPosterior = anoDataAtual;
+    }
+    else if (this->diaFimAno()){
+        diaDataPosterior = "01";
+        mesDataPosterior = meses[0];
+        anoDataPosterior = to_string(stoi(anoDataAtual) + 1);
+    }
+    else if (this->diaComecoMes()){
+        diaDataPosterior = "02";
+        mesDataPosterior = mesDataAtual;
+        anoDataPosterior = anoDataAtual;
+    }
+    else if (this->diaFimMes()){
+        diaDataPosterior = "01";
+        mesDataPosterior = meses[int_mesDataAtual];
+        anoDataPosterior = anoDataAtual;
+    }
+
+    str_dataPosterior = diaDataPosterior + '/' + mesDataPosterior + '/' + anoDataPosterior;
+
+    dataPosterior.setData(str_dataPosterior);
+
+    return dataPosterior;
+}
+
+int Data :: comparaDatas(Data dataX,Data dataY){
+    int resultadoComparacao;
+    int i;
+    string diaX, mesX, anoX;
+    int int_mesX;
+    string diaY, mesY, anoY;
+    int int_mesY;
+    string str_dataX = dataX.getData();
+    string str_dataY = dataY.getData();
+    
+    diaX = str_dataX.substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mesX = str_dataX.substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mesX = dataX.verificaMes(mesX);
+    anoX = str_dataX.substr(POSICAO_SEPARADOR_MES_ANO + 1, TAMANHO_PADRAO_ANO);
+
+    diaY = str_dataY.substr(POSICAO_DIA, TAMANHO_PADRAO_DIA);
+    mesY = str_dataY.substr(POSICAO_SEPARADOR_DIA_MES + 1, TAMANHO_PADRAO_MES);
+    int_mesY = dataY.verificaMes(mesY);
+    anoY = str_dataY.substr(POSICAO_SEPARADOR_MES_ANO + 1, TAMANHO_PADRAO_ANO);
+
+    if((diaX == diaY) && (int_mesX == int_mesY) && (anoX == anoY)){
+        resultadoComparacao = 0;
+    }
+    else if((anoX < anoY) ||
+           ((anoX == anoY) && (int_mesX < int_mesY)) ||
+           ((anoX == anoY) && (int_mesX == int_mesY) && (diaX < diaY))){
+        resultadoComparacao = -1;
+    }
+    else {
+        resultadoComparacao = 1;
+    }
+
+    return resultadoComparacao;
 }
 
 void DataDeValidade::validar(string dataDeValidade) throw (invalid_argument){
